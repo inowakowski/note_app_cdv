@@ -43,7 +43,6 @@ class NoteDetailState extends State<NoteDetail> {
   String get date => null;
 
   File image;
-  Uint8List _bytesImage;
   String base64Image;
 
   @override
@@ -360,9 +359,9 @@ class NoteDetailState extends State<NoteDetail> {
       var image = await ImagePicker.platform.getImage(
         source: ImageSource.gallery,
       );
-      List<int> imageBytes = await image.readAsBytes();
-      base64Image = base64Encode(imageBytes);
-      _bytesImage = Base64Decoder().convert(base64Image);
+      // List<int> imageBytes = await image.readAsBytes();
+      // base64Image = base64Encode(imageBytes);
+      // _bytesImage = Base64Decoder().convert(base64Image);
       if (image == null) return;
       final imageFile = await saveImage(image.path);
       setState(() {
@@ -377,7 +376,7 @@ class NoteDetailState extends State<NoteDetail> {
     final directory = await getApplicationDocumentsDirectory();
     final name = path.basename(imagePath);
     final image = File('${directory.path}/$name');
-
+    print(File(imagePath).copy(image.path));
     return File(imagePath).copy(image.path);
   }
 }

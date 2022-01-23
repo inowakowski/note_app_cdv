@@ -14,7 +14,7 @@ class DatabaseHelper {
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
-  final Uint8List colImage = 'image' as Uint8List;
+  String colImage = 'image';
   String colColor = 'color';
   String colDate = 'date';
 

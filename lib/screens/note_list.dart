@@ -1,13 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/modal_class/notes.dart';
 import 'package:notes_app/screens/note_detail.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_app/screens/search_note.dart';
 import 'package:notes_app/utils/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/screens/settings_page.dart';
+import 'package:path/path.dart' as path;
 
 class NoteList extends StatefulWidget {
   @override
@@ -21,6 +27,9 @@ class NoteListState extends State<NoteList> {
   List<Note> noteList;
   int count = 0;
   int axisCount = 2;
+  File image;
+  Uint8List _bytesImage;
+  String base64Image;
 
   @override
   Widget build(BuildContext context) {
@@ -194,4 +203,30 @@ class NoteListState extends State<NoteList> {
       });
     });
   }
+
+  // Future pickImageNote() async {
+  //   try {
+  //     var image = await ImagePicker.platform.getImage(
+  //       source: ImageSource.gallery,
+  //     );
+  //     List<int> imageBytes = await image.readAsBytes();
+  //     base64Image = base64Encode(imageBytes);
+  //     _bytesImage = Base64Decoder().convert(base64Image);
+  //     if (image == null) return;
+  //     final imageFile = await saveImage(image.path);
+  //     setState(() {
+  //       this.image = imageFile;
+  //     });
+  //   } on Exception catch (e) {
+  //     print('Failed to pick image: $e');
+  //   }
+  // }
+
+  // Future<File> saveImage(String imagePath) async {
+  //   final directory = await getApplicationDocumentsDirectory();
+  //   final name = path.basename(imagePath);
+  //   final image = File('${directory.path}/$name');
+
+  //   return File(imagePath).copy(image.path);
+  // }
 }
