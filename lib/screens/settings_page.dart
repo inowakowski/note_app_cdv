@@ -1,13 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
-import 'package:notes_app/modal_class/notes.dart';
-import 'package:notes_app/utils/widgets.dart';
 
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;
 
-  SettingsPage(this.appBarTitle);
+  SettingsPage(this.appBarTitle, {String title});
 
   @override
   State<StatefulWidget> createState() {
@@ -19,6 +17,9 @@ class SettingsPageState extends State<SettingsPage> {
   DatabaseHelper helper = DatabaseHelper();
 
   String appBarTitle;
+  bool isEdited = false;
+  bool _value = true;
+  String lastSyncDate;
 
   SettingsPageState(this.appBarTitle);
 
@@ -26,6 +27,7 @@ class SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
+          isEdited ? showDiscardDialog(context) : moveToLastScreen();
           return false;
         },
         child: Scaffold(
@@ -36,73 +38,119 @@ class SettingsPageState extends State<SettingsPage> {
               style: Theme.of(context).textTheme.headline5,
             ),
             leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios, color: Colors.black),
-                onPressed: () {}),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.save,
-                  color: Colors.black,
-                ),
+                icon: Icon(Icons.close),
                 onPressed: () {
-                  // titleController.text.length == 0
-                  //     ? showEmptyTitleDialog(context)
-                  //     : _save();
-                },
-              ),
-              // IconButton(
-              //   icon: Icon(
-              //     Icons.close,
-              //     color: Colors.black,
-              //   ),
-              //   onPressed: () {
-              //     showDeleteDialog(context);
-              //   },
-              // )
-            ],
+                  isEdited ? showDiscardDialog(context) : moveToLastScreen();
+                }),
           ),
           body: Container(
             child: Column(
               children: <Widget>[
-                PriorityPicker(
-                  onTap: (index) {},
-                ),
-                ColorPicker(
-                  onTap: (index) {
-                    setState(() {});
-                  },
+                Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Text(
+                      'Export your notes to a text file. Click the button below to backup or restore your notes.'),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: TextField(
-                    maxLength: 255,
-                    style: Theme.of(context).textTheme.bodyText2,
-                    // onChanged: () async {},
-                    decoration: InputDecoration.collapsed(
-                      hintText: 'Title',
-                    ),
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      MaterialButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Export',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        padding: EdgeInsets.all(12.0),
+                        splashColor: Colors.blueAccent,
+                      ),
+                      MaterialButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Restore',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        padding: EdgeInsets.all(12.0),
+                        splashColor: Colors.blueAccent,
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: TextField(
-                      keyboardType: TextInputType.multiline,
-                      maxLines: 10,
-                      maxLength: 255,
-                      style: Theme.of(context).textTheme.bodyText1,
-                      // onChanged: () {},
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'Description',
+                Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Text(
+                    'You can sync your notes with the cloud. Click the button below to sync your notes with the cloud.',
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Sync with the cloud'),
+                          Switch.adaptive(
+                            value: _value,
+                            onChanged: (newValue) =>
+                                setState(() => _value = newValue),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                'last sync: ',
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                              Text(
+                                '12/12/2019',
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: MaterialButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Sync',
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                            color: Colors.blue,
+                            textColor: Colors.white,
+                            padding: EdgeInsets.all(12.0),
+                            splashColor: Colors.blueAccent,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ));
   }
+
+  void moveToLastScreen() {
+    Navigator.pop(context, true);
+  }
+
+  void exportNotes() {}
+  void importNotes() {}
 
   void showDiscardDialog(BuildContext context) {
     showDialog(

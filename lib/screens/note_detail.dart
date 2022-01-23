@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/modal_class/notes.dart';
+import 'package:notes_app/screens/note_list.dart';
+// import 'package:notes_app/screens/modal_bottom_sheet.dart';
 import 'package:notes_app/utils/widgets.dart';
 
 class NoteDetail extends StatefulWidget {
@@ -25,11 +27,17 @@ class NoteDetailState extends State<NoteDetail> {
   TextEditingController descriptionController = TextEditingController();
   int color;
   bool isEdited = false;
+  List<Note> noteList;
 
   NoteDetailState(this.note, this.appBarTitle);
 
+  String get date => null;
+
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
     titleController.text = note.title;
     descriptionController.text = note.description;
     color = note.color;
@@ -43,19 +51,24 @@ class NoteDetailState extends State<NoteDetail> {
             elevation: 0,
             title: Text(
               appBarTitle,
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headline5.copyWith(
+                  // color: Colors.black,
+                  ),
             ),
-            backgroundColor: colors[color],
+            backgroundColor: isDarkMode ? colorsDark[color] : colors[color],
             leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  // color: Colors.black,
+                ),
                 onPressed: () {
                   isEdited ? showDiscardDialog(context) : moveToLastScreen();
                 }),
             actions: <Widget>[
               IconButton(
                 icon: Icon(
-                  Icons.save,
-                  color: Colors.black,
+                  Icons.save_outlined,
+                  // color: Colors.black,
                 ),
                 onPressed: () {
                   titleController.text.length == 0
@@ -64,7 +77,10 @@ class NoteDetailState extends State<NoteDetail> {
                 },
               ),
               IconButton(
-                icon: Icon(Icons.delete, color: Colors.black),
+                icon: Icon(
+                  Icons.delete_outline,
+                  // color: Colors.black,
+                ),
                 onPressed: () {
                   showDeleteDialog(context);
                 },
@@ -72,31 +88,13 @@ class NoteDetailState extends State<NoteDetail> {
             ],
           ),
           body: Container(
-            color: colors[color],
+            color: isDarkMode ? colorsDark[color] : colors[color],
             child: Column(
               children: <Widget>[
-                PriorityPicker(
-                  selectedIndex: 3 - note.priority,
-                  onTap: (index) {
-                    isEdited = true;
-                    note.priority = 3 - index;
-                  },
-                ),
-                ColorPicker(
-                  selectedIndex: note.color,
-                  onTap: (index) {
-                    setState(() {
-                      color = index;
-                    });
-                    isEdited = true;
-                    note.color = index;
-                  },
-                ),
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: TextField(
                     controller: titleController,
-                    maxLength: 255,
                     style: Theme.of(context).textTheme.bodyText2,
                     onChanged: (value) {
                       updateTitle();
@@ -112,7 +110,6 @@ class NoteDetailState extends State<NoteDetail> {
                     child: TextField(
                       keyboardType: TextInputType.multiline,
                       maxLines: 10,
-                      maxLength: 255,
                       controller: descriptionController,
                       style: Theme.of(context).textTheme.bodyText1,
                       onChanged: (value) {
@@ -124,6 +121,99 @@ class NoteDetailState extends State<NoteDetail> {
                     ),
                   ),
                 ),
+                Container(
+                  color: isDarkMode ? colorsDark[color] : colors[color],
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.add_photo_alternate_outlined,
+                            ),
+                            onPressed: () {},
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.color_lens_outlined,
+                            ),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            bottom: 10.0,
+                                            top: 10.0,
+                                            left: 10.0),
+                                        child: ColorPicker(
+                                          selectedIndex: note.color,
+                                          onTap: (index) {
+                                            setState(() {
+                                              color = index;
+                                            });
+                                            isEdited = true;
+                                            note.color = index;
+                                          },
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 20.0,
+                                          top: 10.0,
+                                        ),
+                                        child: Text(
+                                          'Select Color',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .subtitle2,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(
+                          this.note.date,
+                          style: Theme.of(context).textTheme.subtitle2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // PriorityPicker(
+                //   selectedIndex: 3 - note.priority,
+                //   onTap: (index) {
+                //     isEdited = true;
+                //     note.priority = 3 - index;
+                //   },
+                // ),
+                // ColorPicker(
+                //   selectedIndex: note.color,
+                //   onTap: (index) {
+                //     setState(() {
+                //       color = index;
+                //     });
+                //     isEdited = true;
+                //     note.color = index;
+                //   },
+                // ),
+                // Row(
+                //     mainAxisAlignment: MainAxisAlignment.end,
+                //     children: <Widget>[
+                //       Text(this.date,
+                //           style: Theme.of(context).textTheme.subtitle2),
+                //     ])
               ],
             ),
           ),
@@ -147,6 +237,7 @@ class NoteDetailState extends State<NoteDetail> {
             TextButton(
               child: Text(
                 "No",
+                style: Theme.of(context).textTheme.bodyText2,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -155,6 +246,7 @@ class NoteDetailState extends State<NoteDetail> {
             TextButton(
               child: Text(
                 "Yes",
+                style: Theme.of(context).textTheme.bodyText2,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -184,6 +276,7 @@ class NoteDetailState extends State<NoteDetail> {
             TextButton(
               child: Text(
                 "Okay",
+                style: Theme.of(context).textTheme.bodyText2,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -212,17 +305,14 @@ class NoteDetailState extends State<NoteDetail> {
             TextButton(
               child: Text(
                 "No",
+                style: Theme.of(context).textTheme.bodyText2,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Yes",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2
-                      .copyWith(color: Colors.purple)),
+              child: Text("Yes", style: Theme.of(context).textTheme.bodyText2),
               onPressed: () {
                 Navigator.of(context).pop();
                 _delete();

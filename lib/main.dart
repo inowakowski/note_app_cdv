@@ -24,13 +24,12 @@ class MyApp extends StatelessWidget {
           bodyText2: TextStyle(color: Colors.black, fontSize: 20),
           bodyText1: TextStyle(color: Colors.black, fontSize: 18),
           subtitle2: TextStyle(color: Colors.black, fontSize: 14),
+          subtitle1: TextStyle(color: Colors.black, fontSize: 12),
         ),
       ),
       darkTheme: ThemeData(
         primarySwatch: Colors.grey,
-        brightness: Brightness.dark,
         iconTheme: IconThemeData(color: Colors.white),
-        // backgroundColor: Colors.grey[850],
         colorScheme: ColorScheme.dark(
           primary: Colors.grey[900],
           secondary: Colors.grey[900],
@@ -43,6 +42,7 @@ class MyApp extends StatelessWidget {
           onSecondary: Colors.grey[900],
           onSurface: Colors.grey[900],
           secondaryVariant: Colors.grey[900],
+          brightness: Brightness.dark,
         ),
         appBarTheme: AppBarTheme(
             backgroundColor: Colors.grey[850],
@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
           bodyText2: TextStyle(color: Colors.white, fontSize: 20),
           bodyText1: TextStyle(color: Colors.white, fontSize: 18),
           subtitle2: TextStyle(color: Colors.white, fontSize: 14),
+          subtitle1: TextStyle(color: Colors.white, fontSize: 12),
         ),
       ),
       // debugShowCheckedModeBanner: false,

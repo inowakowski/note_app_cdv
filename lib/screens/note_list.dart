@@ -66,19 +66,23 @@ class NoteListState extends State<NoteList> {
             icon: Icon(
               Icons.settings,
             ),
-            onPressed: () {
-              navigateToDetail(SettingsPage('Settings'), 'Settings');
+            onPressed: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SettingsPage("Settings")));
             },
           ),
         ],
       );
     }
 
+    final brightness = Theme.of(context).brightness;
+    bool isDarkMode = brightness == Brightness.dark;
     return Scaffold(
       appBar: myAppBar(),
       body: noteList.length == 0
           ? Container(
-              // color: Colors.blue,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -88,7 +92,6 @@ class NoteListState extends State<NoteList> {
               ),
             )
           : Container(
-              // color: Colors.white,
               child: getNotesList(),
             ),
       floatingActionButton: FloatingActionButton(
@@ -98,14 +101,17 @@ class NoteListState extends State<NoteList> {
         tooltip: 'Add Note',
         child: Icon(
           Icons.add,
-          color: Colors.white,
+          color: isDarkMode ? Colors.black : Colors.white,
         ),
-        backgroundColor: Colors.grey[700],
+        backgroundColor: isDarkMode ? Colors.grey[200] : Colors.grey[700],
       ),
     );
   }
 
   Widget getNotesList() {
+    final brightness = Theme.of(context).brightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
     return StaggeredGridView.countBuilder(
       physics: BouncingScrollPhysics(),
       crossAxisCount: 4,
@@ -119,8 +125,10 @@ class NoteListState extends State<NoteList> {
           child: Container(
             padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-                color: colors[this.noteList[index].color],
-                border: Border.all(width: 2, color: Colors.black),
+                color: isDarkMode
+                    ? colorsDark[this.noteList[index].color]
+                    : colors[this.noteList[index].color],
+                border: Border.all(width: 1, color: Colors.grey),
                 borderRadius: BorderRadius.circular(8.0)),
             child: Column(
               children: <Widget>[
@@ -135,12 +143,6 @@ class NoteListState extends State<NoteList> {
                           style: Theme.of(context).textTheme.bodyText2,
                         ),
                       ),
-                    ),
-                    Text(
-                      getPriorityText(this.noteList[index].priority),
-                      style: TextStyle(
-                          color:
-                              getPriorityColor(this.noteList[index].priority)),
                     ),
                   ],
                 ),
@@ -159,12 +161,6 @@ class NoteListState extends State<NoteList> {
                     ],
                   ),
                 ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text(this.noteList[index].date,
-                          style: Theme.of(context).textTheme.subtitle2),
-                    ])
               ],
             ),
           ),
@@ -175,55 +171,6 @@ class NoteListState extends State<NoteList> {
       crossAxisSpacing: 4.0,
     );
   }
-
-  // Returns the priority color
-  Color getPriorityColor(int priority) {
-    switch (priority) {
-      case 1:
-        return Colors.red;
-        break;
-      case 2:
-        return Colors.yellow;
-        break;
-      case 3:
-        return Colors.green;
-        break;
-
-      default:
-        return Colors.yellow;
-    }
-  }
-
-  // Returns the priority icon
-  String getPriorityText(int priority) {
-    switch (priority) {
-      case 1:
-        return '!!!';
-        break;
-      case 2:
-        return '!!';
-        break;
-      case 3:
-        return '!';
-        break;
-
-      default:
-        return '!';
-    }
-  }
-
-  // void _delete(BuildContext context, Note note) async {
-  //   int result = await databaseHelper.deleteNote(note.id);
-  //   if (result != 0) {
-  //     _showSnackBar(context, 'Note Deleted Successfully');
-  //     updateListView();
-  //   }
-  // }
-
-  // void _showSnackBar(BuildContext context, String message) {
-  //   final snackBar = SnackBar(content: Text(message));
-  //   Scaffold.of(context).showSnackBar(snackBar);
-  // }
 
   void navigateToDetail(Note note, String title) async {
     bool result = await Navigator.push(context,
