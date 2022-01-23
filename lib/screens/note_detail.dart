@@ -1,10 +1,17 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/modal_class/notes.dart';
-import 'package:notes_app/screens/note_list.dart';
-// import 'package:notes_app/screens/modal_bottom_sheet.dart';
 import 'package:notes_app/utils/widgets.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
@@ -33,6 +40,8 @@ class NoteDetailState extends State<NoteDetail> {
 
   String get date => null;
 
+  File image;
+
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
@@ -51,15 +60,12 @@ class NoteDetailState extends State<NoteDetail> {
             elevation: 0,
             title: Text(
               appBarTitle,
-              style: Theme.of(context).textTheme.headline5.copyWith(
-                  // color: Colors.black,
-                  ),
+              style: Theme.of(context).textTheme.headline5,
             ),
             backgroundColor: isDarkMode ? colorsDark[color] : colors[color],
             leading: IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios,
-                  // color: Colors.black,
                 ),
                 onPressed: () {
                   isEdited ? showDiscardDialog(context) : moveToLastScreen();
@@ -68,7 +74,6 @@ class NoteDetailState extends State<NoteDetail> {
               IconButton(
                 icon: Icon(
                   Icons.save_outlined,
-                  // color: Colors.black,
                 ),
                 onPressed: () {
                   titleController.text.length == 0
@@ -121,6 +126,16 @@ class NoteDetailState extends State<NoteDetail> {
                     ),
                   ),
                 ),
+                if (image == null)
+                  Container()
+                else
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.file(
+                      image,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 Container(
                   color: isDarkMode ? colorsDark[color] : colors[color],
                   child: Row(
@@ -132,7 +147,7 @@ class NoteDetailState extends State<NoteDetail> {
                             icon: Icon(
                               Icons.add_photo_alternate_outlined,
                             ),
-                            onPressed: () {},
+                            onPressed: () => pickImageNote(),
                           ),
                           IconButton(
                             icon: Icon(
@@ -191,29 +206,6 @@ class NoteDetailState extends State<NoteDetail> {
                     ],
                   ),
                 ),
-                // PriorityPicker(
-                //   selectedIndex: 3 - note.priority,
-                //   onTap: (index) {
-                //     isEdited = true;
-                //     note.priority = 3 - index;
-                //   },
-                // ),
-                // ColorPicker(
-                //   selectedIndex: note.color,
-                //   onTap: (index) {
-                //     setState(() {
-                //       color = index;
-                //     });
-                //     isEdited = true;
-                //     note.color = index;
-                //   },
-                // ),
-                // Row(
-                //     mainAxisAlignment: MainAxisAlignment.end,
-                //     children: <Widget>[
-                //       Text(this.date,
-                //           style: Theme.of(context).textTheme.subtitle2),
-                //     ])
               ],
             ),
           ),
@@ -354,5 +346,28 @@ class NoteDetailState extends State<NoteDetail> {
   void _delete() async {
     await helper.deleteNote(note.id);
     moveToLastScreen();
+  }
+
+  Future pickImageNote() async {
+    try {
+      final image = await ImagePicker.platform.getImage(
+        source: ImageSource.gallery,
+      );
+      if (image == null) return;
+      final imageFile = await saveImage(image.path);
+      setState(() {
+        this.image = imageFile;
+      });
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  Future<File> saveImage(String imagePath) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final name = path.basename(imagePath);
+    final image = File('${directory.path}/$name');
+
+    return File(imagePath).copy(image.path);
   }
 }

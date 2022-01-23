@@ -10,12 +10,9 @@ class NotesSearch extends SearchDelegate<Note> {
   ThemeData appBarTheme(BuildContext context) {
     assert(context != null);
     final ThemeData theme = Theme.of(context).copyWith(
-        hintColor: Colors.black,
-        primaryColor: Colors.white,
         textTheme: TextTheme(
-          headline6: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
-        ));
+      headline6: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    ));
     assert(theme != null);
     return theme;
   }
@@ -26,7 +23,6 @@ class NotesSearch extends SearchDelegate<Note> {
       IconButton(
         icon: Icon(
           Icons.clear,
-          color: Colors.black,
         ),
         onPressed: () {
           query = '';
@@ -40,7 +36,6 @@ class NotesSearch extends SearchDelegate<Note> {
     return IconButton(
       icon: Icon(
         Icons.arrow_back,
-        color: Colors.black,
       ),
       onPressed: () {
         close(context, null);
@@ -52,7 +47,6 @@ class NotesSearch extends SearchDelegate<Note> {
   Widget buildResults(BuildContext context) {
     if (query == '') {
       return Container(
-        color: Colors.white,
         child: Center(
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -64,12 +58,10 @@ class NotesSearch extends SearchDelegate<Note> {
               child: Icon(
                 Icons.search,
                 size: 50,
-                color: Colors.black,
               ),
             ),
             Text(
               'Enter a note to search.',
-              style: TextStyle(color: Colors.black),
             )
           ],
         )),
@@ -79,7 +71,6 @@ class NotesSearch extends SearchDelegate<Note> {
       getFilteredList(notes);
       if (filteredNotes.length == 0) {
         return Container(
-          color: Colors.white,
           child: Center(
               child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -91,37 +82,35 @@ class NotesSearch extends SearchDelegate<Note> {
                 child: Icon(
                   Icons.sentiment_dissatisfied,
                   size: 50,
-                  color: Colors.black,
                 ),
               ),
               Text(
                 'No results found',
-                style: TextStyle(color: Colors.black),
               )
             ],
           )),
         );
       } else {
         return Container(
-          color: Colors.white,
           child: ListView.builder(
             itemCount: filteredNotes.length == null ? 0 : filteredNotes.length,
             itemBuilder: (context, index) {
               return ListTile(
                 leading: Icon(
                   Icons.note,
-                  color: Colors.black,
                 ),
                 title: Text(
                   filteredNotes[index].title,
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                      color: Colors.black),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18.0,
+                  ),
                 ),
                 subtitle: Text(
                   filteredNotes[index].description,
-                  style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 14.0,
+                  ),
                 ),
                 onTap: () {
                   close(context, filteredNotes[index]);
@@ -148,7 +137,6 @@ class NotesSearch extends SearchDelegate<Note> {
   Widget buildSuggestions(BuildContext context) {
     if (query == '') {
       return Container(
-        color: Colors.white,
         child: Center(
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -160,12 +148,10 @@ class NotesSearch extends SearchDelegate<Note> {
               child: Icon(
                 Icons.search,
                 size: 50,
-                color: Colors.black,
               ),
             ),
             Text(
               'Enter a note to search.',
-              style: TextStyle(color: Colors.black),
             )
           ],
         )),
@@ -175,7 +161,6 @@ class NotesSearch extends SearchDelegate<Note> {
       getFilteredList(notes);
       if (filteredNotes.length == 0) {
         return Container(
-          color: Colors.white,
           child: Center(
               child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -187,37 +172,33 @@ class NotesSearch extends SearchDelegate<Note> {
                 child: Icon(
                   Icons.sentiment_dissatisfied,
                   size: 50,
-                  color: Colors.black,
                 ),
               ),
               Text(
                 'No results found',
-                style: TextStyle(color: Colors.black),
               )
             ],
           )),
         );
       } else {
         return Container(
-          color: Colors.white,
           child: ListView.builder(
             itemCount: filteredNotes.length == null ? 0 : filteredNotes.length,
             itemBuilder: (context, index) {
               return ListTile(
                 leading: Icon(
                   Icons.note,
-                  color: Colors.black,
                 ),
-                title: Text(
-                  filteredNotes[index].title,
-                  style: TextStyle(
+                title: Text(filteredNotes[index].title,
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18.0,
-                      color: Colors.black),
-                ),
+                    )),
                 subtitle: Text(
                   filteredNotes[index].description,
-                  style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 14.0,
+                  ),
                 ),
                 onTap: () {
                   close(context, filteredNotes[index]);

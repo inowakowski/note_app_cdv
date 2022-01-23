@@ -5,6 +5,7 @@ import 'package:notes_app/db_helper/db_helper.dart';
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;
 
+  final isBiometricOn = false;
   SettingsPage(this.appBarTitle, {String title});
 
   @override
@@ -18,9 +19,8 @@ class SettingsPageState extends State<SettingsPage> {
 
   String appBarTitle;
   bool isEdited = false;
-  bool _value = true;
+  bool _value;
   String lastSyncDate;
-
   SettingsPageState(this.appBarTitle);
 
   @override

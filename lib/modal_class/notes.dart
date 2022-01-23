@@ -1,14 +1,16 @@
+import '../utils/utility.dart';
+
 class Note {
   int _id;
   String _title;
   String _description;
   String _date;
-  int _priority, _color;
+  String _image;
+  int _color;
 
-  Note(this._title, this._date, this._priority, this._color,
-      [this._description]);
+  Note(this._title, this._date, this._color, this._image, [this._description]);
 
-  Note.withId(this._id, this._title, this._date, this._priority, this._color,
+  Note.withId(this._id, this._title, this._date, this._color, this._image,
       [this._description]);
 
   int get id => _id;
@@ -17,7 +19,8 @@ class Note {
 
   String get description => _description;
 
-  int get priority => _priority;
+  String get image => _image;
+
   int get color => _color;
   String get date => _date;
 
@@ -33,9 +36,9 @@ class Note {
     }
   }
 
-  set priority(int newPriority) {
-    if (newPriority >= 1 && newPriority <= 3) {
-      this._priority = newPriority;
+  set image(String newImage) {
+    if (newImage.length <= 255) {
+      this._image = newImage;
     }
   }
 
@@ -57,9 +60,9 @@ class Note {
     }
     map['title'] = _title;
     map['description'] = _description;
-    map['priority'] = _priority;
     map['color'] = _color;
     map['date'] = _date;
+    map['image'] = _image;
 
     return map;
   }
@@ -69,8 +72,8 @@ class Note {
     this._id = map['id'];
     this._title = map['title'];
     this._description = map['description'];
-    this._priority = map['priority'];
     this._color = map['color'];
     this._date = map['date'];
+    this._image = map['image'];
   }
 }

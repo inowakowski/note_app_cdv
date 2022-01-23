@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
@@ -13,7 +14,7 @@ class DatabaseHelper {
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
-  String colPriority = 'priority';
+  final Uint8List colImage = 'image' as Uint8List;
   String colColor = 'color';
   String colDate = 'date';
 
@@ -48,22 +49,23 @@ class DatabaseHelper {
   void _createDb(Database db, int newVersion) async {
     await db.execute(
         'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
-        '$colDescription TEXT, $colPriority INTEGER, $colColor INTEGER,$colDate TEXT)');
+        '$colDescription TEXT, $colColor INTEGER,$colDate TEXT, $colImage TEXT)');
   }
 
   // Fetch Operation: Get all note objects from database
   Future<List<Map<String, dynamic>>> getNoteMapList() async {
     Database db = await this.database;
-
-//		var result = await db.rawQuery('SELECT * FROM $noteTable order by $colPriority ASC');
-    var result = await db.query(noteTable, orderBy: '$colPriority ASC');
+    var result = await db.query(noteTable);
     return result;
   }
 
   // Insert Operation: Insert a Note object to database
   Future<int> insertNote(Note note) async {
     Database db = await this.database;
-    var result = await db.insert(noteTable, note.toMap());
+    var result = await db.insert(
+      noteTable,
+      note.toMap(),
+    );
     return result;
   }
 
@@ -105,5 +107,10 @@ class DatabaseHelper {
     }
 
     return noteList;
+  }
+
+  void savePicture(Note image) async {
+    Database db = await this.database;
+    await db.insert("Image", image.toMap());
   }
 }

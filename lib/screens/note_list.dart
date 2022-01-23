@@ -79,6 +79,7 @@ class NoteListState extends State<NoteList> {
 
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
+
     return Scaffold(
       appBar: myAppBar(),
       body: noteList.length == 0
@@ -96,7 +97,7 @@ class NoteListState extends State<NoteList> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          navigateToDetail(Note('', '', 3, 0), 'Add Note');
+          navigateToDetail(Note('', '', 0, ''), 'Add Note');
         },
         tooltip: 'Add Note',
         child: Icon(
