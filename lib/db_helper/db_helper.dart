@@ -109,8 +109,26 @@ class DatabaseHelper {
     return noteList;
   }
 
-  void savePicture(Note image) async {
-    Database db = await this.database;
-    await db.insert("Image", image.toMap());
-  }
+  // void saveImage(Imagedata imagedata) async {
+  //   assert(imagedata != null);
+  //   var db = await this.database;
+  //   await db.transaction((txn) async {
+  //     return await txn.rawInsert('INSERT INTO $noteTable VALUES(' +
+  //         '\'' +
+  //         imagedata.image +
+  //         '\'' +
+  //         ')');
+  //   });
+  // }
+
+  // Future<List<Imagedata>> getMyImage() async {
+  //   var db = await this.database;
+  //   List<Map> list = await db.rawQuery('SELECT * FROM $noteTable');
+  //   List<Imagedata> images = new List();
+  //   for (int i = 0; i < list.length; i++) {
+  //     images.add(new Imagedata(noteMapList[i]["id"], noteMapList[i]["image"]));
+  //   }
+  //   print(images.length);
+  //   return images;
+  // }
 }

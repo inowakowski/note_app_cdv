@@ -1,5 +1,3 @@
-import '../utils/utility.dart';
-
 class Note {
   int _id;
   String _title;
@@ -37,9 +35,7 @@ class Note {
   }
 
   set image(String newImage) {
-    if (newImage.length <= 255) {
-      this._image = newImage;
-    }
+    this._image = newImage;
   }
 
   set color(int newColor) {

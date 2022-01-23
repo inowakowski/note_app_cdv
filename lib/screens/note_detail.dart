@@ -1,7 +1,9 @@
 // ignore_for_file: invalid_use_of_visible_for_testing_member
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +43,8 @@ class NoteDetailState extends State<NoteDetail> {
   String get date => null;
 
   File image;
+  Uint8List _bytesImage;
+  String base64Image;
 
   @override
   Widget build(BuildContext context) {
@@ -350,9 +354,15 @@ class NoteDetailState extends State<NoteDetail> {
 
   Future pickImageNote() async {
     try {
-      final image = await ImagePicker.platform.getImage(
+      // final image = await ImagePicker.platform.getImage(
+      //   source: ImageSource.gallery,
+      // );
+      var image = await ImagePicker.platform.getImage(
         source: ImageSource.gallery,
       );
+      List<int> imageBytes = await image.readAsBytes();
+      base64Image = base64Encode(imageBytes);
+      _bytesImage = Base64Decoder().convert(base64Image);
       if (image == null) return;
       final imageFile = await saveImage(image.path);
       setState(() {
