@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;
@@ -57,7 +61,9 @@ class SettingsPageState extends State<SettingsPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          exportToFile();
+                        },
                         child: Text(
                           'Export',
                           style: Theme.of(context).textTheme.headline6,
@@ -68,7 +74,10 @@ class SettingsPageState extends State<SettingsPage> {
                         splashColor: Colors.blueAccent,
                       ),
                       MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // importFromFile();
+                          importNotes();
+                        },
                         child: Text(
                           'Restore',
                           style: Theme.of(context).textTheme.headline6,
@@ -115,7 +124,9 @@ class SettingsPageState extends State<SettingsPage> {
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
                               Text(
-                                '12/12/2019',
+                                lastSyncDate ?? '',
+                                // '${DateFormat.yMMMd().format(DateTime.now())} ' +
+                                // '${DateFormat.jms().format(DateTime.now())}',
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ],
@@ -124,7 +135,9 @@ class SettingsPageState extends State<SettingsPage> {
                         Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: MaterialButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              syncNotes();
+                            },
                             child: Text(
                               'Sync',
                               style: Theme.of(context).textTheme.headline6,
@@ -149,8 +162,9 @@ class SettingsPageState extends State<SettingsPage> {
     Navigator.pop(context, true);
   }
 
-  void exportNotes() {}
-  void importNotes() {}
+  void importNotes() {
+    Navigator.pop(context, true);
+  }
 
   void showDiscardDialog(BuildContext context) {
     showDialog(
@@ -246,5 +260,21 @@ class SettingsPageState extends State<SettingsPage> {
         );
       },
     );
+  }
+
+  Future<void> exportToFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/notes.txt');
+    await file.writeAsString('');
+  }
+
+  void importFromFile() {}
+
+  void syncNotes() {
+    setState(() {
+      lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
+          ' ' +
+          DateFormat.jms().format(DateTime.now());
+    });
   }
 }

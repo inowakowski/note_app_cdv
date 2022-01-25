@@ -1,2 +1,0 @@
-- name: Release APK Publisher
-  uses: Cafrecode/action-release-apk@1.0.2
