@@ -1,19 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+// import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/modal_class/notes.dart';
 import 'package:notes_app/screens/note_detail.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_app/screens/search_note.dart';
 import 'package:notes_app/utils/widgets.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/screens/settings_page.dart';
-import 'package:path/path.dart' as path;
 
 class NoteList extends StatefulWidget {
   @override
@@ -28,8 +24,8 @@ class NoteListState extends State<NoteList> {
   int count = 0;
   int axisCount = 2;
   File image;
-  Uint8List _bytesImage;
-  String base64Image;
+  // Uint8List _bytesImage;
+  // String base64Image;
 
   @override
   Widget build(BuildContext context) {

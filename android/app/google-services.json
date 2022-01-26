@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1018151554563",
+    "project_id": "note-app-cdv",
+    "storage_bucket": "note-app-cdv.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018151554563:android:cef78c43f7e3d9cac60836",
+        "android_client_info": {
+          "package_name": "com.example.note_app_cdv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1018151554563-4dtuo5h0cos067l5j0s86qrfnf5tuqf4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbDLy8EL4wbeHkRuSSlFmqXxnB-JMZk4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1018151554563-4dtuo5h0cos067l5j0s86qrfnf5tuqf4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

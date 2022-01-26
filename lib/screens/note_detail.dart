@@ -1,14 +1,11 @@
 // ignore_for_file: invalid_use_of_visible_for_testing_member
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/modal_class/notes.dart';
 import 'package:notes_app/utils/widgets.dart';
@@ -45,7 +42,6 @@ class NoteDetailState extends State<NoteDetail> {
 
   File image;
   String base64Image;
-  bool _keyboardVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +126,6 @@ class NoteDetailState extends State<NoteDetail> {
                           child: TextField(
                             keyboardType: TextInputType.multiline,
                             maxLines: 20,
-                            minLines: 10,
                             controller: descriptionController,
                             style: Theme.of(context).textTheme.bodyText1,
                             onChanged: (value) {

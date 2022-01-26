@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
@@ -23,7 +22,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   String appBarTitle;
   bool isEdited = false;
-  bool _value;
+  // bool _value;
   String lastSyncDate;
   SettingsPageState(this.appBarTitle);
 
@@ -51,106 +50,89 @@ class SettingsPageState extends State<SettingsPage> {
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.all(12.0),
+                  padding: EdgeInsets.all(20.0),
                   child: Text(
-                      'Export your notes to a text file. Click the button below to backup or restore your notes.'),
+                    'You can sync your notes to the cloud. Click the button "Sync" to sync your notes to the cloud. If your notes are synced to the cloud, you can restore them from the cloud by clicking the "Restore" button.',
+                    textAlign: TextAlign.justify,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      MaterialButton(
-                        onPressed: () {
-                          exportToFile();
-                        },
-                        child: Text(
-                          'Export',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        padding: EdgeInsets.all(12.0),
-                        splashColor: Colors.blueAccent,
+                  child: MaterialButton(
+                    onPressed: () {},
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
+                      child: Text(
+                        'Restore',
+                        style: Theme.of(context).textTheme.headline6,
                       ),
-                      MaterialButton(
-                        onPressed: () {
-                          // importFromFile();
-                          importNotes();
-                        },
-                        child: Text(
-                          'Restore',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        padding: EdgeInsets.all(12.0),
-                        splashColor: Colors.blueAccent,
-                      ),
-                    ],
+                    ),
+                    color: Colors.blue,
+                    textColor: Colors.white,
+                    padding: EdgeInsets.all(8.0),
+                    splashColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(300.0)),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: Text(
-                    'You can sync your notes with the cloud. Click the button below to sync your notes with the cloud.',
-                  ),
-                ),
-                Column(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text('Sync with the cloud'),
-                          Switch.adaptive(
-                            value: _value,
-                            onChanged: (newValue) =>
-                                setState(() => _value = newValue),
+                          Text(
+                            'Last sync: ',
+                            // style: Theme.of(context).textTheme.subtitle2,
                           ),
+                          Text(lastSyncDate ?? '',
+                              // '${DateFormat.yMMMd().format(DateTime.now())} ' +
+                              // '${DateFormat.jms().format(DateTime.now())}',
+                              style: TextStyle(color: Colors.lightGreen[600])),
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Row(
-                            children: <Widget>[
-                              Text(
-                                'last sync: ',
-                                style: Theme.of(context).textTheme.subtitle2,
-                              ),
-                              Text(
-                                lastSyncDate ?? '',
-                                // '${DateFormat.yMMMd().format(DateTime.now())} ' +
-                                // '${DateFormat.jms().format(DateTime.now())}',
-                                style: Theme.of(context).textTheme.subtitle2,
-                              ),
-                            ],
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: MaterialButton(
+                        onPressed: () {
+                          syncNotes();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Sync',
+                            style: Theme.of(context).textTheme.headline6,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: MaterialButton(
-                            onPressed: () {
-                              syncNotes();
-                            },
-                            child: Text(
-                              'Sync',
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            color: Colors.blue,
-                            textColor: Colors.white,
-                            padding: EdgeInsets.all(12.0),
-                            splashColor: Colors.blueAccent,
-                          ),
-                        ),
-                      ],
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        padding: EdgeInsets.all(12.0),
+                        splashColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(300.0)),
+                      ),
                     ),
                   ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: MaterialButton(
+                    onPressed: () {},
+                    color: Colors.orange,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(300.0)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
+                      child: Text(
+                        'Login to the cloud',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

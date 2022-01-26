@@ -14,8 +14,10 @@ dependencies:
   intl: 0.17.0
   flutter_staggered_grid_view: 0.4.0
   image_picker: ^0.8.4+4
-  # ext_storage: ^1.0.3
-  keyboard_visibility: any
+  firebase_auth: ^3.3.5
+  firebase_core : ^1.11.0
+  firebase_storage: ^10.2.5
+  # firebase_image: any
 
 dev_dependencies:
   flutter_test:
