@@ -12,11 +12,12 @@ dependencies:
   sqflite: 2.0.0+3
   path_provider: ^2.0.1
   intl: 0.17.0
-  flutter_staggered_grid_view: 0.4.0
+  flutter_staggered_grid_view: ^0.4.0
   image_picker: ^0.8.4+4
   firebase_auth: ^3.3.5
   firebase_core : ^1.11.0
   firebase_storage: ^10.2.5
+  azblob: ^2.0.0
   # firebase_image: any
 
 dev_dependencies:

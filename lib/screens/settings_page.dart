@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:azblob/azblob.dart';
+import 'package:sqflite/sqflite.dart';
 
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;
@@ -24,13 +26,16 @@ class SettingsPageState extends State<SettingsPage> {
   bool isEdited = false;
   // bool _value;
   String lastSyncDate;
+  String restoreState;
+  Color statusColor;
+  Color restoreColor;
   SettingsPageState(this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          isEdited ? showDiscardDialog(context) : moveToLastScreen();
+          moveToLastScreen();
           return false;
         },
         child: Scaffold(
@@ -43,7 +48,7 @@ class SettingsPageState extends State<SettingsPage> {
             leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
-                  isEdited ? showDiscardDialog(context) : moveToLastScreen();
+                  moveToLastScreen();
                 }),
           ),
           body: Container(
@@ -76,6 +81,17 @@ class SettingsPageState extends State<SettingsPage> {
                         borderRadius: BorderRadius.circular(300.0)),
                   ),
                 ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      '$restoreState',
+                      style: TextStyle(
+                        color: restoreColor,
+                      ),
+                    ),
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -85,12 +101,12 @@ class SettingsPageState extends State<SettingsPage> {
                         children: <Widget>[
                           Text(
                             'Last sync: ',
-                            // style: Theme.of(context).textTheme.subtitle2,
                           ),
-                          Text(lastSyncDate ?? '',
-                              // '${DateFormat.yMMMd().format(DateTime.now())} ' +
-                              // '${DateFormat.jms().format(DateTime.now())}',
-                              style: TextStyle(color: Colors.lightGreen[600])),
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(lastSyncDate ?? '',
+                                style: TextStyle(color: statusColor)),
+                          ),
                         ],
                       ),
                     ),
@@ -144,119 +160,70 @@ class SettingsPageState extends State<SettingsPage> {
     Navigator.pop(context, true);
   }
 
-  void importNotes() {
-    Navigator.pop(context, true);
+  exportToAzure() async {
+    try {
+      String path = await getDatabasesPath();
+      String fileName = '$path/notes.db';
+      List contentList = await helper.getNoteMapList();
+      String content = contentList.join();
+      String container = 'notter-project';
+      var storage = AzureStorage.parse(
+          'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
+      await storage.putBlob(
+        '/$container/$fileName',
+        body: content,
+      );
+      setState(() {
+        lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
+            ' ' +
+            DateFormat.jms().format(DateTime.now());
+        statusColor = Colors.green[600];
+      });
+    } on AzureStorageException catch (ex) {
+      setState(() {
+        lastSyncDate = 'Azure Storage Exception';
+        statusColor = Colors.red;
+      });
+      print(ex.message);
+    } catch (err) {
+      setState(() {
+        lastSyncDate = 'Unknown Error';
+        statusColor = Colors.red;
+      });
+      print(err);
+    }
   }
 
-  void showDiscardDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          title: Text(
-            "Discard Changes?",
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
-          content: Text("Are you sure you want to discard changes?",
-              style: Theme.of(context).textTheme.bodyText1),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                "No",
-              ),
-              onPressed: () {},
-            ),
-            TextButton(
-              child: Text(
-                "Yes",
-              ),
-              onPressed: () {},
-            ),
-          ],
-        );
-      },
-    );
+  restoreToAzure() async {
+    try {
+      String container = 'notter-project';
+      var storage = AzureStorage.parse(
+          'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
+      await storage.getBlob(
+        '/$container/notes.db',
+        String body = '',
+        (String body) {
+          helper.insertNote (body);
+        },
+      );
+      restoreState = 'Restored';
+      restoreColor = Colors.green[600];
+    } on AzureStorageException catch (ex) {
+      setState(() {
+        restoreState = 'Azure Storage Exception';
+        restoreColor = Colors.red;
+      });
+      print(ex.message);
+    } catch (err) {
+      setState(() {
+        restoreState = 'Unknown Error';
+        restoreColor = Colors.red;
+      });
+      print(err);
+    }
   }
-
-  void showEmptyTitleDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          title: Text(
-            "Title is empty!",
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
-          content: Text('The title of the note cannot be empty.',
-              style: Theme.of(context).textTheme.bodyText1),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                "Okay",
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void showDeleteDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          title: Text(
-            "Delete Note?",
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
-          content: Text("Are you sure you want to delete this note?",
-              style: Theme.of(context).textTheme.bodyText1),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                "No",
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text("Yes",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2
-                      .copyWith(color: Colors.purple)),
-              onPressed: () {},
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> exportToFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/notes.txt');
-    await file.writeAsString('');
-  }
-
-  void importFromFile() {}
 
   void syncNotes() {
-    setState(() {
-      lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
-          ' ' +
-          DateFormat.jms().format(DateTime.now());
-    });
+    exportToAzure();
   }
 }
