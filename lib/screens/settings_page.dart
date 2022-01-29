@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
@@ -21,18 +18,24 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsPageState extends State<SettingsPage> {
   DatabaseHelper helper = DatabaseHelper();
+  SettingsDB settingsHelper = SettingsDB();
 
   String appBarTitle;
-  bool isEdited = false;
-  // bool _value;
+  List settingsList;
+  Settings settings;
   String lastSyncDate;
-  String restoreState;
+  String restoreDate;
   Color statusColor;
   Color restoreColor;
+  var user = 'user0';
   SettingsPageState(this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {
+    if (settingsList == null) {
+      settingsList = ['Not restored', 'Not synced'];
+      updateSettingsView();
+    }
     return WillPopScope(
         onWillPop: () async {
           moveToLastScreen();
@@ -48,110 +51,114 @@ class SettingsPageState extends State<SettingsPage> {
             leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
-                  moveToLastScreen();
+                  _saveSettings();
                 }),
           ),
-          body: Container(
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text(
-                    'You can sync your notes to the cloud. Click the button "Sync" to sync your notes to the cloud. If your notes are synced to the cloud, you can restore them from the cloud by clicking the "Restore" button.',
-                    textAlign: TextAlign.justify,
-                  ),
+          body: Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                  'You can sync your notes to the cloud. Click the button "Sync" to sync your notes to the cloud. If your notes are synced to the cloud, you can restore them from the cloud by clicking the "Restore" button.',
+                  textAlign: TextAlign.justify,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: MaterialButton(
-                    onPressed: () {},
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
-                      child: Text(
-                        'Restore',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                    ),
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    padding: EdgeInsets.all(8.0),
-                    splashColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(300.0)),
-                  ),
-                ),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      '$restoreState',
-                      style: TextStyle(
-                        color: restoreColor,
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                        children: <Widget>[
-                          Text(
-                            'Last sync: ',
-                          ),
-                          FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: Text(lastSyncDate ?? '',
-                                style: TextStyle(color: statusColor)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: MaterialButton(
-                        onPressed: () {
-                          syncNotes();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Sync',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          'Last restore:',
                         ),
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        padding: EdgeInsets.all(12.0),
-                        splashColor: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(300.0)),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: MaterialButton(
-                    onPressed: () {},
-                    color: Colors.orange,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(300.0)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
-                      child: Text(
-                        'Login to the cloud',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          settingsList[0] ??
+                              settingsList[0]['restoreDate'] ??
+                              settings.restoreDate ??
+                              restoreDate,
+                          style: TextStyle(color: restoreColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: MaterialButton(
+                      onPressed: () {
+                        restoreFromAzure();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
+                        child: Text(
+                          'Restore',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ),
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                      padding: EdgeInsets.all(8.0),
+                      splashColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(300.0)),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          'Last sync:',
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          settingsList[1] ??
+                              settingsList[1]['lastSyncDate'] ??
+                              settings.lastSyncDate ??
+                              lastSyncDate,
+                          style: TextStyle(color: statusColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: MaterialButton(
+                      onPressed: () {
+                        syncNotes();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Sync',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ),
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                      padding: EdgeInsets.all(12.0),
+                      splashColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(300.0)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ));
   }
@@ -169,11 +176,21 @@ class SettingsPageState extends State<SettingsPage> {
       String container = 'notter-project';
       var storage = AzureStorage.parse(
           'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
+
       await storage.putBlob(
         '/$container/$fileName',
         body: content,
       );
-      setState(() {
+      setState(() async {
+        // settingsHelper.lastSyncDate =
+        //     DateFormat.yMMMd().format(DateTime.now()) +
+        //         ' ' +
+        //         DateFormat.jms().format(DateTime.now());
+        // if (settings.id != null) {
+        //   await settingsHelper.updateSettings(settings);
+        // } else {
+        //   await settingsHelper.insertSetiings(settings);
+        // }
         lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
             ' ' +
             DateFormat.jms().format(DateTime.now());
@@ -194,33 +211,72 @@ class SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  restoreToAzure() async {
+  restoreFromAzure() async {
     try {
       String container = 'notter-project';
       var storage = AzureStorage.parse(
           'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
-      await storage.getBlob(
+      var body = storage.getBlob(
         '/$container/notes.db',
-        String body = '',
-        (String body) {
-          helper.insertNote (body);
-        },
       );
-      restoreState = 'Restored';
+
+      print('------------------');
+      print('------------------');
+      print(body);
+      print('------------------');
+      setState(() async {
+        // var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
+        //     ' ' +
+        //     DateFormat.jms().format(DateTime.now());
+        // settingsHelper.restoreDate = restoreStateDB;
+        // restoreDate = restoreStateDB;
+        // if (settings.id != null) {
+        //   await settingsHelper.updateSettings(settings);
+        // } else {
+        //   await settingsHelper.insertSetiings(settings);
+        // }
+        statusColor = Colors.green[600];
+      });
       restoreColor = Colors.green[600];
     } on AzureStorageException catch (ex) {
       setState(() {
-        restoreState = 'Azure Storage Exception';
+        restoreDate = 'Azure Storage Exception';
         restoreColor = Colors.red;
       });
       print(ex.message);
     } catch (err) {
       setState(() {
-        restoreState = 'Unknown Error';
+        restoreDate = 'Unknown Error';
         restoreColor = Colors.red;
       });
       print(err);
     }
+  }
+
+  void updateSettingsView() {
+    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
+      settingsListFuture.then((settingsList) {
+        setState(() {
+          this.settingsList = settingsList;
+        });
+      });
+    });
+    print(settingsList);
+  }
+
+  void _saveSettings() async {
+    try {
+      if (settings.id != null) {
+        await settingsHelper.updateSettings(settings);
+      } else {
+        await settingsHelper.insertSetiings(settings);
+      }
+    } catch (e) {
+      print(e);
+    }
+    moveToLastScreen();
   }
 
   void syncNotes() {
