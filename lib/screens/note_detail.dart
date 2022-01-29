@@ -338,7 +338,9 @@ class NoteDetailState extends State<NoteDetail> {
   void _save() async {
     moveToLastScreen();
 
-    note.date = DateFormat.yMMMd().format(DateTime.now());
+    note.date = DateFormat.yMMMd().format(DateTime.now()) +
+        ' ' +
+        DateFormat.jms().format(DateTime.now());
 
     if (note.id != null) {
       await helper.updateNote(note);
@@ -354,15 +356,9 @@ class NoteDetailState extends State<NoteDetail> {
 
   Future pickImageNote() async {
     try {
-      // final image = await ImagePicker.platform.getImage(
-      //   source: ImageSource.gallery,
-      // );
       var image = await ImagePicker.platform.getImage(
         source: ImageSource.gallery,
       );
-      // List<int> imageBytes = await image.readAsBytes();
-      // base64Image = base64Encode(imageBytes);
-      // _bytesImage = Base64Decoder().convert(base64Image);
       if (image == null) return;
       final imageFile = await saveImage(image.path);
       setState(() {

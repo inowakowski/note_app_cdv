@@ -20,7 +20,10 @@ class NoteList extends StatefulWidget {
 
 class NoteListState extends State<NoteList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
+  SettingsDB settingsHelper = SettingsDB();
+
   List<Note> noteList;
+  List settingsList;
   int count = 0;
   int axisCount = 2;
   File image;
@@ -71,11 +74,12 @@ class NoteListState extends State<NoteList> {
             icon: Icon(
               Icons.settings,
             ),
-            onPressed: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SettingsPage("Settings")));
+            onPressed: () {
+              navigateToSettings();
+              //   await Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //           builder: (context) => SettingsPage("Settings")));
             },
           ),
         ],
@@ -185,6 +189,27 @@ class NoteListState extends State<NoteList> {
     if (result == true) {
       updateListView();
     }
+  }
+
+  void navigateToSettings() async {
+    bool result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => SettingsPage("Settings")));
+
+    if (result == true) {
+      updateSettingsView();
+    }
+  }
+
+  void updateSettingsView() {
+    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
+      settingsListFuture.then((settingsList) {
+        setState(() {
+          this.settingsList = settingsList;
+        });
+      });
+    });
   }
 
   void updateListView() {

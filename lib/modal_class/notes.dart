@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class Note {
   int _id;
   String _title;
@@ -70,6 +72,6 @@ class Note {
     this._description = map['description'];
     this._color = map['color'];
     this._date = map['date'];
-    this._image = map['image'];
+    this._image = map['picture'];
   }
 }
