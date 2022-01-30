@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:azblob/azblob.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:notes_app/modal_class/settings.dart';
 
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;

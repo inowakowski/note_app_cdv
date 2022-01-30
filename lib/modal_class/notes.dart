@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 class Note {
   int _id;
   String _title;

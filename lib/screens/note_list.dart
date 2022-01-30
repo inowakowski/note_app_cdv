@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/modal_class/notes.dart';
+import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/screens/note_detail.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_app/screens/search_note.dart';
