@@ -18,6 +18,7 @@ dependencies:
   firebase_core : ^1.11.0
   firebase_storage: ^10.2.5
   azblob: ^2.0.0
+  http: ^0.13.4
 
 dev_dependencies:
   flutter_test:

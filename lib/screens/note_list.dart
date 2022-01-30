@@ -37,6 +37,8 @@ class NoteListState extends State<NoteList> {
       noteList = [];
       updateListView();
     }
+    final brightness = Theme.of(context).brightness;
+    bool isDarkMode = brightness == Brightness.dark;
 
     Widget myAppBar() {
       return AppBar(
@@ -87,9 +89,6 @@ class NoteListState extends State<NoteList> {
       );
     }
 
-    final brightness = Theme.of(context).brightness;
-    bool isDarkMode = brightness == Brightness.dark;
-
     return Scaffold(
       appBar: myAppBar(),
       body: noteList.length == 0
@@ -107,7 +106,7 @@ class NoteListState extends State<NoteList> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          navigateToDetail(Note('', '', 0, ''), 'Add Note');
+          navigateToDetail(Note('', '', 0, null), 'Add Note');
         },
         tooltip: 'Add Note',
         child: Icon(
@@ -225,30 +224,4 @@ class NoteListState extends State<NoteList> {
       });
     });
   }
-
-  // Future pickImageNote() async {
-  //   try {
-  //     var image = await ImagePicker.platform.getImage(
-  //       source: ImageSource.gallery,
-  //     );
-  //     List<int> imageBytes = await image.readAsBytes();
-  //     base64Image = base64Encode(imageBytes);
-  //     _bytesImage = Base64Decoder().convert(base64Image);
-  //     if (image == null) return;
-  //     final imageFile = await saveImage(image.path);
-  //     setState(() {
-  //       this.image = imageFile;
-  //     });
-  //   } on Exception catch (e) {
-  //     print('Failed to pick image: $e');
-  //   }
-  // }
-
-  // Future<File> saveImage(String imagePath) async {
-  //   final directory = await getApplicationDocumentsDirectory();
-  //   final name = path.basename(imagePath);
-  //   final image = File('${directory.path}/$name');
-
-  //   return File(imagePath).copy(image.path);
-  // }
 }

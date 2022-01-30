@@ -1,4 +1,5 @@
 import 'dart:io';
+// import 'dart:typed_data';
 
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
@@ -14,7 +15,7 @@ class DatabaseHelper {
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
-  String colImage = 'image';
+  // Uint8List colImage = 'image';
   String colColor = 'color';
   String colDate = 'date';
 
@@ -49,7 +50,7 @@ class DatabaseHelper {
   void _createDb(Database db, int newVersion) async {
     await db.execute(
         'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
-        '$colDescription TEXT, $colColor INTEGER,$colDate TEXT, $colImage TEXT)');
+        '$colDescription TEXT, $colColor INTEGER,$colDate TEXT)'); //, $colImage BLOB
   }
 
   // Fetch Operation: Get all note objects from database
@@ -82,6 +83,12 @@ class DatabaseHelper {
     var db = await this.database;
     int result =
         await db.rawDelete('DELETE FROM $noteTable WHERE $colId = $id');
+    return result;
+  }
+
+  Future<int> deleteAll() async {
+    var db = await this.database;
+    int result = await db.rawDelete('DELETE FROM $noteTable');
     return result;
   }
 

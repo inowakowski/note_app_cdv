@@ -1,9 +1,11 @@
+import 'dart:typed_data';
+
 class Note {
   int _id;
   String _title;
   String _description;
   String _date;
-  String _image;
+  Uint8List _image;
   int _color;
 
   Note(this._title, this._date, this._color, this._image, [this._description]);
@@ -17,7 +19,7 @@ class Note {
 
   String get description => _description;
 
-  String get image => _image;
+  Uint8List get image => _image;
 
   int get color => _color;
   String get date => _date;
@@ -34,7 +36,7 @@ class Note {
     }
   }
 
-  set image(String newImage) {
+  set image(Uint8List newImage) {
     this._image = newImage;
   }
 
@@ -70,6 +72,31 @@ class Note {
     this._description = map['description'];
     this._color = map['color'];
     this._date = map['date'];
+    this._date = map['date'];
     this._image = map['picture'];
+  }
+
+  Map<String, dynamic> toJson() {
+    var map = Map<String, dynamic>();
+    if (id != null) {
+      map['id'] = _id;
+    }
+    map['title'] = _title;
+    map['description'] = _description;
+    map['color'] = _color;
+    map['date'] = _date;
+    map['image'] = _image;
+
+    return map;
+  }
+
+  // Extract a Note object from a Map object
+  factory Note.fromJson(dynamic json) {
+    return Note(
+        json['title'] as String,
+        json['date'] as String,
+        json['color'] as int,
+        json['image'] as Uint8List,
+        json['description'] as String);
   }
 }

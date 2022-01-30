@@ -35,7 +35,7 @@ class NotesSearch extends SearchDelegate<Note> {
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: Icon(
-        Icons.arrow_back,
+        Icons.arrow_back_ios_new,
       ),
       onPressed: () {
         close(context, null);
