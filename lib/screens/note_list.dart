@@ -21,7 +21,7 @@ class NoteList extends StatefulWidget {
 
 class NoteListState extends State<NoteList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  SettingsDB settingsHelper = SettingsDB();
+  // SettingsDB settingsHelper = SettingsDB();
 
   List<Note> noteList;
   List settingsList;
@@ -79,10 +79,10 @@ class NoteListState extends State<NoteList> {
             ),
             onPressed: () {
               navigateToSettings();
-              //   await Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //           builder: (context) => SettingsPage("Settings")));
+              // Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => SettingsPage("Settings")));
             },
           ),
         ],
@@ -165,7 +165,10 @@ class NoteListState extends State<NoteList> {
                         child: Text(
                             this.noteList[index].description == null
                                 ? ''
-                                : this.noteList[index].description,
+                                : this
+                                    .noteList[index]
+                                    .description
+                                    .replaceAll('/', '\n'),
                             style: Theme.of(context).textTheme.bodyText1),
                       )
                     ],
@@ -192,25 +195,26 @@ class NoteListState extends State<NoteList> {
   }
 
   void navigateToSettings() async {
-    bool result = await Navigator.push(context,
+    // bool result = await
+    Navigator.push(context,
         MaterialPageRoute(builder: (context) => SettingsPage("Settings")));
 
-    if (result == true) {
-      updateSettingsView();
-    }
+    // if (result == true) {
+    //   updateSettingsView();
+    // }
   }
 
-  void updateSettingsView() {
-    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
-      settingsListFuture.then((settingsList) {
-        setState(() {
-          this.settingsList = settingsList;
-        });
-      });
-    });
-  }
+  // void updateSettingsView() {
+  //   final Future<Database> dbFuture = settingsHelper.initializeDatabase();
+  //   dbFuture.then((database) {
+  //     Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
+  //     settingsListFuture.then((settingsList) {
+  //       setState(() {
+  //         this.settingsList = settingsList;
+  //       });
+  //     });
+  //   });
+  // }
 
   void updateListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();

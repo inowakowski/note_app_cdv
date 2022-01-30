@@ -47,6 +47,9 @@ class _SignUpPage extends State<SignUpPage> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
+                style: (TextStyle(
+                  fontSize: 16,
+                )),
                 decoration: InputDecoration(
                   hintText: "Enter your nickname",
                   icon: Icon(Icons.person_add_outlined),
@@ -62,6 +65,9 @@ class _SignUpPage extends State<SignUpPage> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
+                style: (TextStyle(
+                  fontSize: 16,
+                )),
                 decoration: InputDecoration(
                   hintText: "Enter your email",
                   icon: Icon(Icons.email_outlined),
@@ -77,6 +83,9 @@ class _SignUpPage extends State<SignUpPage> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
+                style: (TextStyle(
+                  fontSize: 16,
+                )),
                 decoration: InputDecoration(
                   hintText: "Enter your password",
                   icon: Icon(Icons.lock_outline),
@@ -99,6 +108,9 @@ class _SignUpPage extends State<SignUpPage> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
+                style: (TextStyle(
+                  fontSize: 16,
+                )),
                 decoration: InputDecoration(
                   hintText: "Enter your password again",
                   icon: Icon(Icons.lock_outline),
@@ -137,7 +149,7 @@ class _SignUpPage extends State<SignUpPage> {
                   signUp(context);
                 },
                 color: Colors.blue,
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(5.0),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0)),
               ),
@@ -156,7 +168,7 @@ class _SignUpPage extends State<SignUpPage> {
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(5.0),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0),
                     side: BorderSide(color: Colors.blue, width: 2.0)),

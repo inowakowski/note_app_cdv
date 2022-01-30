@@ -47,6 +47,9 @@ class _LogInPage extends State<LogInPage> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
+                style: (TextStyle(
+                  fontSize: 16,
+                )),
                 decoration: InputDecoration(
                   hintText: "Enter your email",
                   icon: Icon(Icons.email_outlined),
@@ -62,6 +65,9 @@ class _LogInPage extends State<LogInPage> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
+                style: (TextStyle(
+                  fontSize: 16,
+                )),
                 controller: _userPasswordController,
                 decoration: InputDecoration(
                   hintText: "Enter your password",
@@ -105,7 +111,7 @@ class _LogInPage extends State<LogInPage> {
                   logIn(context);
                 },
                 color: Colors.blue,
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(5.0),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0)),
               ),
@@ -128,7 +134,7 @@ class _LogInPage extends State<LogInPage> {
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(5.0),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0),
                     side: BorderSide(color: Colors.blue, width: 2.0)),
@@ -141,7 +147,10 @@ class _LogInPage extends State<LogInPage> {
   }
 }
 
-void logIn(BuildContext context) {
+// ignore: non_constant_identifier_names
+bool LoginState = !LoginState ?? false;
+
+bool logIn(BuildContext context) {
   final snackBar = SnackBar(
     content: const Text(
       'Logged in successfully',
@@ -150,5 +159,6 @@ void logIn(BuildContext context) {
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-  Navigator.pop(context, true);
+  Navigator.pop(context, LoginState = true);
+  // return isLogin = true;
 }

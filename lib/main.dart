@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         // primarySwatch: Colors.white,
         brightness: Brightness.light,
+        disabledColor: Colors.grey,
         iconTheme: IconThemeData(color: Colors.black),
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.white,
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         primarySwatch: Colors.grey,
         iconTheme: IconThemeData(color: Colors.white),
+        disabledColor: Colors.grey,
         colorScheme: ColorScheme.dark(
           primary: Colors.white,
           // secondary: Colors.white,

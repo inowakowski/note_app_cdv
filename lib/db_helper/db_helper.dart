@@ -49,8 +49,9 @@ class DatabaseHelper {
 
   void _createDb(Database db, int newVersion) async {
     await db.execute(
-        'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
-        '$colDescription TEXT, $colColor INTEGER,$colDate TEXT)'); //, $colImage BLOB
+      'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
+      '$colDescription TEXT, $colColor INTEGER,$colDate TEXT)',
+    ); //, $colImage BLOB
   }
 
   // Fetch Operation: Get all note objects from database
@@ -193,7 +194,7 @@ class SettingsDB {
     return result;
   }
 
-  Future<List<Settings>> getSettings() async {
+  Future<List<String>> getSettings() async {
     var restoreDate = await getRestore();
     var lastSyncDate = await getSync();
     List settingsList = [restoreDate, lastSyncDate];

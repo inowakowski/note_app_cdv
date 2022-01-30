@@ -57,7 +57,8 @@ class Note {
       map['id'] = _id;
     }
     map['title'] = _title;
-    map['description'] = _description;
+    map['description'] =
+        _description.replaceAll("/", "\n").replaceAll("\n", "/");
     map['color'] = _color;
     map['date'] = _date;
     map['image'] = _image;
@@ -76,27 +77,31 @@ class Note {
     this._image = map['picture'];
   }
 
-  Map<String, dynamic> toJson() {
-    var map = Map<String, dynamic>();
-    if (id != null) {
-      map['id'] = _id;
-    }
-    map['title'] = _title;
-    map['description'] = _description;
-    map['color'] = _color;
-    map['date'] = _date;
-    map['image'] = _image;
+  // Map<String, dynamic> toJson() => {
+  //       "id": _id,
+  //       "title": _title,
+  //       "description": _description,
+  //       "color": _color,
+  //       "date": _date,
+  //       "image": _image,
+  //     };
 
-    return map;
-  }
+  // Note.fromJson(Map<String, dynamic> json) {
+  //   _id = json['id'];
+  //   _title = json['title'];
+  //   _description = json['description'];
+  //   _color = json['color'];
+  //   _date = json['date'];
+  //   _image = json['image'];
+  // }
 
   // Extract a Note object from a Map object
-  factory Note.fromJson(dynamic json) {
-    return Note(
-        json['title'] as String,
-        json['date'] as String,
-        json['color'] as int,
-        json['image'] as Uint8List,
-        json['description'] as String);
-  }
+  // factory Note.fromJson(dynamic json) {
+  //   return Note(
+  //       json['title'] as String,
+  //       json['date'] as String,
+  //       json['color'] as int,
+  //       json['image'] as Uint8List,
+  //       json['description'] as String);
+  // }
 }

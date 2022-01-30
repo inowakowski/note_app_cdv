@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
@@ -5,6 +7,8 @@ import 'package:azblob/azblob.dart';
 import 'package:notes_app/screens/login_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/modal_class/settings.dart';
+import 'package:notes_app/modal_class/notes.dart';
+import 'package:http/http.dart' as http;
 
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;
@@ -20,7 +24,7 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsPageState extends State<SettingsPage> {
   DatabaseHelper helper = DatabaseHelper();
-  SettingsDB settingsHelper = SettingsDB();
+  // SettingsDB settingsHelper = SettingsDB();
 
   String appBarTitle;
   List settingsList;
@@ -31,14 +35,13 @@ class SettingsPageState extends State<SettingsPage> {
   Color restoreColor;
   var user = 'user0';
   SettingsPageState(this.appBarTitle);
-  var isLogIn = false;
+  var isLogIn = true;
 
   @override
   Widget build(BuildContext context) {
-    if (settingsList == null) {
-      settingsList = ['Not restored', 'Not synced'];
-      updateSettingsView();
-    }
+    final brightness = Theme.of(context).brightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
     return WillPopScope(
         onWillPop: () async {
           moveToLastScreen();
@@ -54,7 +57,8 @@ class SettingsPageState extends State<SettingsPage> {
             leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
-                  _saveSettings();
+                  // _saveSettings();
+                  moveToLastScreen();
                 }),
           ),
           body: ListView(
@@ -72,6 +76,7 @@ class SettingsPageState extends State<SettingsPage> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Text(
                           'Last restore:',
@@ -80,10 +85,7 @@ class SettingsPageState extends State<SettingsPage> {
                           height: 10.0,
                         ),
                         Text(
-                          settingsList[0] ??
-                              restoreDate ??
-                              settingsList[0]['restoreDate'] ??
-                              settings.restoreDate,
+                          restoreDate ?? 'Not restored',
                           style: TextStyle(color: restoreColor),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -93,9 +95,8 @@ class SettingsPageState extends State<SettingsPage> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: MaterialButton(
-                      disabledColor: Colors.grey,
                       onPressed: () {
-                        restoreFromAzure();
+                        isLogIn ? restoreFromAzure() : null;
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -105,6 +106,7 @@ class SettingsPageState extends State<SettingsPage> {
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
+                      disabledColor: Colors.grey,
                       color: Colors.blue,
                       padding: EdgeInsets.all(5.0),
                       splashColor: Colors.blueAccent,
@@ -120,6 +122,7 @@ class SettingsPageState extends State<SettingsPage> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Text(
                           'Last export:',
@@ -128,10 +131,7 @@ class SettingsPageState extends State<SettingsPage> {
                           height: 10.0,
                         ),
                         Text(
-                          settingsList[1] ??
-                              lastSyncDate ??
-                              settingsList[1]['lastSyncDate'] ??
-                              settings.lastSyncDate,
+                          lastSyncDate ?? 'Not synced',
                           style: TextStyle(color: statusColor),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -141,9 +141,8 @@ class SettingsPageState extends State<SettingsPage> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: MaterialButton(
-                      disabledColor: Colors.grey,
                       onPressed: () {
-                        syncNotes();
+                        isLogIn ? syncNotes() : null;
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -153,6 +152,7 @@ class SettingsPageState extends State<SettingsPage> {
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
+                      disabledColor: Colors.grey,
                       color: Colors.blue,
                       padding: EdgeInsets.all(5.0),
                       splashColor: Colors.blueAccent,
@@ -172,6 +172,35 @@ class SettingsPageState extends State<SettingsPage> {
                     padding: const EdgeInsets.all(5.0),
                     child: Text(
                       isLogIn ? 'Log out' : 'Log in',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                  ),
+                  color: isLogIn
+                      ? isDarkMode
+                          ? Colors.grey[850]
+                          : Colors.white
+                      : Colors.blue,
+                  padding: EdgeInsets.all(5.0),
+                  splashColor: Colors.blueAccent,
+                  shape: isLogIn
+                      ? RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(300.0),
+                          side: BorderSide(color: Colors.blue, width: 2.0),
+                        )
+                      : RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(300.0)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: MaterialButton(
+                  onPressed: () {
+                    helper.deleteAll();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                      'Delete all notes',
                       style: Theme.of(context).textTheme.headline6,
                     ),
                   ),
@@ -204,10 +233,10 @@ class SettingsPageState extends State<SettingsPage> {
           'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
 
       await storage.putBlob(
-        '/$container/$fileName',
+        '/$container/user0/$fileName',
         body: content,
       );
-      setState(() async {
+      setState(() {
         // settingsHelper.lastSyncDate =
         //     DateFormat.yMMMd().format(DateTime.now()) +
         //         ' ' +
@@ -218,7 +247,7 @@ class SettingsPageState extends State<SettingsPage> {
         //   await settingsHelper.insertSetiings(settings);
         // }
         lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
-            ' ' +
+            '\n' +
             DateFormat.jms().format(DateTime.now());
         statusColor = Colors.green[600];
       });
@@ -242,18 +271,51 @@ class SettingsPageState extends State<SettingsPage> {
   restoreFromAzure() async {
     try {
       String container = 'notter-project';
-      var storage = AzureStorage.parse(
-          'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
-      var body = storage.getBlob(
-        '/$container/notes.db',
-      );
+      // var storage = AzureStorage.parse(
+      //     'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
+      // var body = storage.getBlob(
+      //   '/$container/notes.db',
+      // );
+      Uri url = Uri.parse(
+          'https://notterprojectuser.blob.core.windows.net/$container/user0//data/user/0/com.example.note_app_cdv/databases/notes.db');
 
-      setState(() async {
-        // var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
-        //     ' ' +
-        //     DateFormat.jms().format(DateTime.now());
+      http.Response response = await http.get(url);
+      String content = response.body;
+      print('Content: $content');
+      // String replace =
+      //     content.replaceAll('}{', ';').replaceAll('{', '').replaceAll('}', '');
+      String replace = content
+          .replaceAll('}{', ';')
+          .replaceAllMapped(RegExp(r'\{|\}'), (Match m) => '');
+      print('Replace: ' + replace);
+      List<String> contentList = replace.split(';');
+      List jsonList = [];
+
+      for (int i = 0; i < contentList.length; i++) {
+        // Map<String, dynamic> note = jsonDecode(contentList[i]);
+        // await helper.insertNote(note);
+        List<String> json = contentList[i].split(',');
+        print('Row $i: ' + contentList[i]);
+        print('Json: ' + json.toString());
+      }
+
+      for (int i = 0; i < jsonList.length; i++) {
+        try {
+          Map<String, dynamic> note = jsonDecode(jsonList[i]);
+          print('Json $i: $note');
+        } catch (e) {
+          print('Json error: $e');
+        }
+      }
+
+      // String path = await getDatabasesPath();
+
+      setState(() {
+        var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
+            '\n' +
+            DateFormat.jms().format(DateTime.now());
         // settingsHelper.restoreDate = restoreStateDB;
-        // restoreDate = restoreStateDB;
+        restoreDate = restoreStateDB;
         // if (settings.id != null) {
         //   await settingsHelper.updateSettings(settings);
         // } else {
@@ -277,31 +339,31 @@ class SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  void updateSettingsView() {
-    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
-      settingsListFuture.then((settingsList) {
-        setState(() {
-          this.settingsList = settingsList;
-        });
-      });
-    });
-    print(settingsList);
-  }
+  // void updateSettingsView() {
+  //   final Future<Database> dbFuture = settingsHelper.initializeDatabase();
+  //   dbFuture.then((database) {
+  //     Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
+  //     settingsListFuture.then((settingsList) {
+  //       setState(() {
+  //         this.settingsList = settingsList;
+  //       });
+  //     });
+  //   });
+  //   print(settingsList);
+  // }
 
-  void _saveSettings() async {
-    try {
-      if (settings.id != null) {
-        await settingsHelper.updateSettings(settings);
-      } else {
-        await settingsHelper.insertSetiings(settings);
-      }
-    } catch (e) {
-      print(e);
-    }
-    moveToLastScreen();
-  }
+  // void _saveSettings() async {
+  //   try {
+  //     if (settings.id != null) {
+  //       await settingsHelper.updateSettings(settings);
+  //     } else {
+  //       await settingsHelper.insertSetiings(settings);
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  //   moveToLastScreen();
+  // }
 
   void syncNotes() {
     exportToAzure();
