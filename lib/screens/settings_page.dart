@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:azblob/azblob.dart';
+import 'package:notes_app/screens/login_page.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/modal_class/settings.dart';
 
@@ -30,6 +31,7 @@ class SettingsPageState extends State<SettingsPage> {
   Color restoreColor;
   var user = 'user0';
   SettingsPageState(this.appBarTitle);
+  var isLogIn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,7 @@ class SettingsPageState extends State<SettingsPage> {
                   _saveSettings();
                 }),
           ),
-          body: Column(
+          body: ListView(
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.all(20.0),
@@ -89,22 +91,22 @@ class SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: MaterialButton(
+                      disabledColor: Colors.grey,
                       onPressed: () {
                         restoreFromAzure();
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
-                            top: 8.0, bottom: 8.0, left: 20.0, right: 20.0),
+                            top: 5.0, bottom: 5.0, left: 20.0, right: 20.0),
                         child: Text(
                           'Restore',
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
                       color: Colors.blue,
-                      textColor: Colors.white,
-                      padding: EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(5.0),
                       splashColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(300.0)),
@@ -139,25 +141,46 @@ class SettingsPageState extends State<SettingsPage> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: MaterialButton(
+                      disabledColor: Colors.grey,
                       onPressed: () {
                         syncNotes();
                       },
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(
+                            top: 5.0, bottom: 5.0, left: 26.0, right: 26.0),
                         child: Text(
                           'Export',
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
                       color: Colors.blue,
-                      textColor: Colors.white,
-                      padding: EdgeInsets.all(12.0),
+                      padding: EdgeInsets.all(5.0),
                       splashColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(300.0)),
                     ),
                   ),
                 ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: MaterialButton(
+                  onPressed: () {
+                    logInAction(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                      isLogIn ? 'Log out' : 'Log in',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                  ),
+                  color: Colors.blue,
+                  padding: EdgeInsets.all(5.0),
+                  splashColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(300.0)),
+                ),
               ),
             ],
           ),
@@ -225,10 +248,6 @@ class SettingsPageState extends State<SettingsPage> {
         '/$container/notes.db',
       );
 
-      print('------------------');
-      print('------------------');
-      print(body);
-      print('------------------');
       setState(() async {
         // var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
         //     ' ' +
@@ -240,7 +259,7 @@ class SettingsPageState extends State<SettingsPage> {
         // } else {
         //   await settingsHelper.insertSetiings(settings);
         // }
-        statusColor = Colors.green[600];
+        restoreColor = Colors.green[600];
       });
       restoreColor = Colors.green[600];
     } on AzureStorageException catch (ex) {
@@ -287,4 +306,13 @@ class SettingsPageState extends State<SettingsPage> {
   void syncNotes() {
     exportToAzure();
   }
+}
+
+void logInAction(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => LogInPage('Log in'),
+    ),
+  );
 }
