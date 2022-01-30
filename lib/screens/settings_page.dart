@@ -78,9 +78,9 @@ class SettingsPageState extends State<SettingsPage> {
                         ),
                         Text(
                           settingsList[0] ??
+                              restoreDate ??
                               settingsList[0]['restoreDate'] ??
-                              settings.restoreDate ??
-                              restoreDate,
+                              settings.restoreDate,
                           style: TextStyle(color: restoreColor),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -119,16 +119,16 @@ class SettingsPageState extends State<SettingsPage> {
                     child: Column(
                       children: <Widget>[
                         Text(
-                          'Last sync:',
+                          'Last export:',
                         ),
                         SizedBox(
                           height: 10.0,
                         ),
                         Text(
                           settingsList[1] ??
+                              lastSyncDate ??
                               settingsList[1]['lastSyncDate'] ??
-                              settings.lastSyncDate ??
-                              lastSyncDate,
+                              settings.lastSyncDate,
                           style: TextStyle(color: statusColor),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -144,7 +144,7 @@ class SettingsPageState extends State<SettingsPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          'Sync',
+                          'Export',
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ),
@@ -166,6 +166,8 @@ class SettingsPageState extends State<SettingsPage> {
   void moveToLastScreen() {
     Navigator.pop(context, true);
   }
+
+  //TODO: Export notes to Azure - done
 
   exportToAzure() async {
     try {
@@ -210,6 +212,8 @@ class SettingsPageState extends State<SettingsPage> {
       print(err);
     }
   }
+
+  // TODO - restore from Azure - not working
 
   restoreFromAzure() async {
     try {
