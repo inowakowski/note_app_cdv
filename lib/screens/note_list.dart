@@ -21,7 +21,7 @@ class NoteList extends StatefulWidget {
 
 class NoteListState extends State<NoteList> {
   DatabaseHelper databaseHelper = DatabaseHelper();
-  // SettingsDB settingsHelper = SettingsDB();
+  SettingsDB settingsHelper = SettingsDB();
 
   List<Note> noteList;
   List settingsList;
@@ -42,7 +42,10 @@ class NoteListState extends State<NoteList> {
 
     Widget myAppBar() {
       return AppBar(
-        title: Text('Notter', style: Theme.of(context).textTheme.headline5),
+        title: Text(
+          'Notter',
+          style: Theme.of(context).textTheme.headline5,
+        ),
         centerTitle: true,
         elevation: 0,
         // backgroundColor: Colors.white,
@@ -83,6 +86,14 @@ class NoteListState extends State<NoteList> {
               //     context,
               //     MaterialPageRoute(
               //         builder: (context) => SettingsPage("Settings")));
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.update,
+            ),
+            onPressed: () {
+              updateListView();
             },
           ),
         ],

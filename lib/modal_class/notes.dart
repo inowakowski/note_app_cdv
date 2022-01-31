@@ -77,23 +77,23 @@ class Note {
     this._image = map['picture'];
   }
 
-  // Map<String, dynamic> toJson() => {
-  //       "id": _id,
-  //       "title": _title,
-  //       "description": _description,
-  //       "color": _color,
-  //       "date": _date,
-  //       "image": _image,
-  //     };
+  Map<String, dynamic> toJson() => {
+        "id": _id,
+        "title": _title,
+        "description": _description,
+        "color": _color,
+        "date": _date,
+        "image": _image,
+      };
 
-  // Note.fromJson(Map<String, dynamic> json) {
-  //   _id = json['id'];
-  //   _title = json['title'];
-  //   _description = json['description'];
-  //   _color = json['color'];
-  //   _date = json['date'];
-  //   _image = json['image'];
-  // }
+  Note.fromJson(Map<String, dynamic> json) {
+    _id = json['id'];
+    _title = json['title'];
+    _description = json['description'];
+    _color = json['color'];
+    _date = json['date'];
+    _image = json['image'];
+  }
 
   // Extract a Note object from a Map object
   // factory Note.fromJson(dynamic json) {

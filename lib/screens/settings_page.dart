@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:azblob/azblob.dart';
 import 'package:notes_app/screens/login_page.dart';
+import 'package:notes_app/screens/note_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/modal_class/notes.dart';
@@ -12,8 +15,7 @@ import 'package:http/http.dart' as http;
 
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;
-
-  final isBiometricOn = false;
+  // SettingsPage({Key key, this.appBarTitle, this.note}) : super(key: key);
   SettingsPage(this.appBarTitle, {String title});
 
   @override
@@ -24,9 +26,10 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsPageState extends State<SettingsPage> {
   DatabaseHelper helper = DatabaseHelper();
-  // SettingsDB settingsHelper = SettingsDB();
+  SettingsDB settingsHelper = SettingsDB();
 
   String appBarTitle;
+  Note note;
   List settingsList;
   Settings settings;
   String lastSyncDate;
@@ -96,7 +99,7 @@ class SettingsPageState extends State<SettingsPage> {
                     padding: const EdgeInsets.all(20.0),
                     child: MaterialButton(
                       onPressed: () {
-                        isLogIn ? restoreFromAzure() : null;
+                        isLogIn ? restoreFromAzure('') : null;
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -266,50 +269,37 @@ class SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  HttpClient httpClient = new HttpClient();
+  // Future<F
+
   // TODO - restore from Azure - not working
 
-  restoreFromAzure() async {
+  restoreFromAzure(String username) async {
     try {
       String container = 'notter-project';
-      // var storage = AzureStorage.parse(
-      //     'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
-      // var body = storage.getBlob(
-      //   '/$container/notes.db',
-      // );
       Uri url = Uri.parse(
-          'https://notterprojectuser.blob.core.windows.net/$container/user0//data/user/0/com.example.note_app_cdv/databases/notes.db');
+          'https://notterprojectuser.blob.core.windows.net/$container$username//data/user/0/com.example.note_app_cdv/databases/notes.db');
 
       http.Response response = await http.get(url);
       String content = response.body;
-      print('Content: $content');
-      // String replace =
-      //     content.replaceAll('}{', ';').replaceAll('{', '').replaceAll('}', '');
+      print('Dwl Content: $content');
       String replace = content
           .replaceAll('}{', ';')
           .replaceAllMapped(RegExp(r'\{|\}'), (Match m) => '');
-      print('Replace: ' + replace);
+      print('Dwl Replace: ' + replace);
       List<String> contentList = replace.split(';');
-      List jsonList = [];
+      print('Dwl ContentList: $contentList');
 
       for (int i = 0; i < contentList.length; i++) {
-        // Map<String, dynamic> note = jsonDecode(contentList[i]);
-        // await helper.insertNote(note);
         List<String> json = contentList[i].split(',');
-        print('Row $i: ' + contentList[i]);
-        print('Json: ' + json.toString());
-      }
 
-      for (int i = 0; i < jsonList.length; i++) {
-        try {
-          Map<String, dynamic> note = jsonDecode(jsonList[i]);
-          print('Json $i: $note');
-        } catch (e) {
-          print('Json error: $e');
+        Note note = Note.fromMapObject(json);
+
+        await helper.updateNote(note);
+        for (int j = 0; j < json.length; j++) {
+          print('Dwl Json[$j]: ${json[j]}');
         }
       }
-
-      // String path = await getDatabasesPath();
-
       setState(() {
         var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
             '\n' +
@@ -324,18 +314,19 @@ class SettingsPageState extends State<SettingsPage> {
         restoreColor = Colors.green[600];
       });
       restoreColor = Colors.green[600];
-    } on AzureStorageException catch (ex) {
+      print('Dwl Restore Success');
+    } on HttpException catch (ex) {
       setState(() {
-        restoreDate = 'Azure Storage Exception';
+        restoreDate = 'Http Exception';
         restoreColor = Colors.red;
       });
-      print(ex.message);
+      print('Dwl Restore error http:' + ex.message.toString());
     } catch (err) {
       setState(() {
         restoreDate = 'Unknown Error';
         restoreColor = Colors.red;
       });
-      print(err);
+      print('Dwl Restore error: ' + err.toString());
     }
   }
 

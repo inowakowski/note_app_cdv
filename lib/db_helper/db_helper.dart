@@ -122,10 +122,10 @@ class SettingsDB {
   static SettingsDB _settingsHelper; // Singleton DatabaseHelper
   static Database _database;
 
+  String settingsTable = 'settings_table';
   String restoreDate = 'restore_date';
   String lastSyncDate = 'last_sync_date';
   String colId = 'id';
-  String settingsTable = 'settings_table';
 
   SettingsDB._createInstance();
 
