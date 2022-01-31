@@ -2,14 +2,26 @@ class Settings {
   int id;
   String restoreDate;
   String lastSyncDate;
+  bool isLogin;
+  String userName;
 
-  Settings({this.id, this.restoreDate, this.lastSyncDate});
+  Settings({
+    this.id,
+    this.restoreDate,
+    this.lastSyncDate,
+    this.isLogin,
+    this.userName,
+  });
 
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
-    map['id'] = id;
+    if (id != null) {
+      map['id'] = id;
+    }
     map['restore_date'] = restoreDate;
     map['last_sync_date'] = lastSyncDate;
+    map['is_login'] = isLogin;
+    map['user_name'] = userName;
     return map;
   }
 
@@ -17,5 +29,7 @@ class Settings {
     this.id = map['id'];
     this.restoreDate = map['restore_date'];
     this.lastSyncDate = map['last_sync_date'];
+    this.isLogin = map['is_login'];
+    this.userName = map['user_name'];
   }
 }

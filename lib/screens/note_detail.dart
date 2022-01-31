@@ -41,8 +41,6 @@ class NoteDetailState extends State<NoteDetail> {
   String get date => null;
 
   File image;
-  String base64Image;
-
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;

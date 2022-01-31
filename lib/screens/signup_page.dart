@@ -16,7 +16,7 @@ class _SignUpPage extends State<SignUpPage> {
   String appBarTitle;
   _SignUpPage(this.appBarTitle);
 
-  var _userPasswordController;
+  // var _userPasswordController;
   bool _passwordVisible = false;
 
   void _toggle() {
@@ -181,6 +181,7 @@ class _SignUpPage extends State<SignUpPage> {
   }
 }
 
+//TODO: Add sign up logic here
 void signUp(BuildContext context) {
   final snackBar = SnackBar(
     content: const Text(

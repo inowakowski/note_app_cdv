@@ -1,11 +1,10 @@
-import 'dart:convert';
-// import 'dart:html';
-import 'dart:io';
+// ignore_for_file: unnecessary_statements
 
-// import 'package:flutter/foundation.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
+import 'package:notes_app/db_helper/db_settings.dart';
 import 'package:azblob/azblob.dart';
 import 'package:notes_app/screens/login_page.dart';
 // import 'package:notes_app/screens/note_list.dart';
@@ -31,7 +30,6 @@ class SettingsPageState extends State<SettingsPage> {
 
   String appBarTitle;
   Note note;
-  List settingsList;
   Settings settings;
   String lastSyncDate;
   String restoreDate;
@@ -45,6 +43,9 @@ class SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
+    var id = settingsHelper.getId();
+    print('id ErrSave : $id');
+    updateSettingsView();
 
     return WillPopScope(
         onWillPop: () async {
@@ -70,7 +71,16 @@ class SettingsPageState extends State<SettingsPage> {
               Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Text(
-                  'You can sync your notes to the cloud. Click the button "Sync" to sync your notes to the cloud. If your notes are synced to the cloud, you can restore them from the cloud by clicking the "Restore" button.',
+                  'If you want sync or restore notes from other device, you need to login. ',
+                  textAlign: TextAlign.justify,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                  isLogIn
+                      ? 'You are logged in as: ' + username.replaceAll('/', '')
+                      : 'You are not logged in',
                   textAlign: TextAlign.justify,
                 ),
               ),
@@ -89,7 +99,9 @@ class SettingsPageState extends State<SettingsPage> {
                           height: 10.0,
                         ),
                         Text(
-                          restoreDate ?? 'Not restored',
+                          isLogIn
+                              ? restoreDate ?? 'Not restored'
+                              : 'Not logged in',
                           style: TextStyle(color: restoreColor),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -135,7 +147,9 @@ class SettingsPageState extends State<SettingsPage> {
                           height: 10.0,
                         ),
                         Text(
-                          lastSyncDate ?? 'Not synced',
+                          isLogIn
+                              ? lastSyncDate ?? 'Not synced'
+                              : 'Not logged in',
                           style: TextStyle(color: statusColor),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -170,7 +184,7 @@ class SettingsPageState extends State<SettingsPage> {
                 padding: const EdgeInsets.all(20.0),
                 child: MaterialButton(
                   onPressed: () {
-                    logInAction(context);
+                    isLogIn ? logOutAction() : logInAction(context);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
@@ -224,7 +238,7 @@ class SettingsPageState extends State<SettingsPage> {
     Navigator.pop(context, true);
   }
 
-  //TODO: Export notes to Azure - done
+  //export to Azure
 
   exportToAzure(String username) async {
     try {
@@ -240,19 +254,14 @@ class SettingsPageState extends State<SettingsPage> {
         '/$container$username/$fileName',
         body: content,
       );
-      setState(() {
-        // settingsHelper.lastSyncDate =
-        //     DateFormat.yMMMd().format(DateTime.now()) +
-        //         ' ' +
-        //         DateFormat.jms().format(DateTime.now());
-        // if (settings.id != null) {
-        //   await settingsHelper.updateSettings(settings);
-        // } else {
-        //   await settingsHelper.insertSetiings(settings);
-        // }
-        lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
-            '\n' +
+      setState(() async {
+        var lastSyncDateDB = DateFormat.yMMMd().format(DateTime.now()) +
+            ' ' +
             DateFormat.jms().format(DateTime.now());
+        lastSyncDate = lastSyncDateDB.replaceAll(' ', '\n');
+
+        _saveLastSyncDate(lastSyncDateDB);
+
         statusColor = Colors.green[600];
       });
     } on AzureStorageException catch (ex) {
@@ -270,10 +279,8 @@ class SettingsPageState extends State<SettingsPage> {
     }
   }
 
+//restore from Azure
   HttpClient httpClient = new HttpClient();
-  // Future<F
-
-  // TODO - restore from Azure - not working
 
   restoreFromAzure(String username) async {
     try {
@@ -306,20 +313,16 @@ class SettingsPageState extends State<SettingsPage> {
               jsonList[5].split(':')[2],
           'image': jsonList[6].split(':')[1],
         };
-        print('Dwl Note: $note');
         await helper.insertNote(Note.fromMapObject(note));
       }
-      setState(() {
+      setState(() async {
         var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
-            '\n' +
+            ' ' +
             DateFormat.jms().format(DateTime.now());
-        // settingsHelper.restoreDate = restoreStateDB;
-        restoreDate = restoreStateDB;
-        // if (settings.id != null) {
-        //   await settingsHelper.updateSettings(settings);
-        // } else {
-        //   await settingsHelper.insertSetiings(settings);
-        // }
+        restoreDate = restoreStateDB.replaceAll(' ', '\n');
+
+        _saveRestoreDate(restoreStateDB);
+
         restoreColor = Colors.green[600];
       });
       restoreColor = Colors.green[600];
@@ -329,49 +332,67 @@ class SettingsPageState extends State<SettingsPage> {
         restoreDate = 'Http Exception';
         restoreColor = Colors.red;
       });
-      print('Dwl Restore error http:' + ex.message.toString());
+      print(ex);
     } catch (err) {
       setState(() {
         restoreDate = 'Unknown Error';
         restoreColor = Colors.red;
       });
-      print('Dwl Restore error: ' + err.toString());
+      print(err);
     }
   }
 
-  // void updateSettingsView() {
-  //   final Future<Database> dbFuture = settingsHelper.initializeDatabase();
-  //   dbFuture.then((database) {
-  //     Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
-  //     settingsListFuture.then((settingsList) {
-  //       setState(() {
-  //         this.settingsList = settingsList;
-  //       });
-  //     });
-  //   });
-  //   print(settingsList);
-  // }
+  void updateSettingsView() {
+    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
+    dbFuture.then((database) {
+      Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
+      settingsListFuture.then((settingsList) {
+        setState(() {
+          this.restoreDate = settingsList[0].restoreDate;
+          this.lastSyncDate = settingsList[0].lastSyncDate;
+          this.isLogIn = settingsList[0].isLogin;
+          this.username = settingsList[0].userName;
+        });
+      });
+    });
+  }
 
-  // void _saveSettings() async {
-  //   try {
-  //     if (settings.id != null) {
-  //       await settingsHelper.updateSettings(settings);
-  //     } else {
-  //       await settingsHelper.insertSetiings(settings);
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  //   moveToLastScreen();
-  // }
+  void _saveRestoreDate(String state) async {
+    try {
+      if (settings.id != null) {
+        await settingsHelper.updateRestoreDate(state, 1);
+      } else {
+        await settingsHelper.insertRestoreDate(state);
+      }
+    } catch (e) {
+      print('ErrSave RD: $e');
+    }
+  }
 
-}
+  void _saveLastSyncDate(String state) async {
+    try {
+      if (settings.id != null) {
+        await settingsHelper.updateLastSyncDate(state, 1);
+      } else {
+        await settingsHelper.insertLastSyncDate(state);
+      }
+    } catch (e) {
+      print('ErrSave LSD: $e');
+    }
+  }
 
-void logInAction(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => LogInPage('Log in'),
-    ),
-  );
+  //TODO: Add a function to logout
+  logOutAction() {}
+
+  void logInAction(BuildContext context) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LogInPage('Log in'),
+      ),
+    );
+  }
+
+  //TODO: Add a function to check if the user is logged in or not.
+  logInCheck() {}
 }

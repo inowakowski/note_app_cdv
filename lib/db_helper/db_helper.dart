@@ -1,11 +1,8 @@
 import 'dart:io';
-// import 'dart:typed_data';
-
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:notes_app/modal_class/notes.dart';
-import 'package:notes_app/modal_class/settings.dart';
 
 class DatabaseHelper {
   static DatabaseHelper _databaseHelper; // Singleton DatabaseHelper
@@ -115,89 +112,5 @@ class DatabaseHelper {
     }
 
     return noteList;
-  }
-}
-
-class SettingsDB {
-  static SettingsDB _settingsHelper; // Singleton DatabaseHelper
-  static Database _database;
-
-  String settingsTable = 'settings_table';
-  String restoreDate = 'restore_date';
-  String lastSyncDate = 'last_sync_date';
-  String colId = 'id';
-
-  SettingsDB._createInstance();
-
-  factory SettingsDB() {
-    if (_settingsHelper == null) {
-      _settingsHelper = SettingsDB
-          ._createInstance(); // This is executed only once, singleton object
-    }
-    return _settingsHelper;
-  }
-
-  Future<Database> get database async {
-    if (_database == null) {
-      _database = await initializeDatabase();
-    }
-    return _database;
-  }
-
-  Future<Database> initializeDatabase() async {
-    // Get the directory path for both Android and iOS to store database.
-    Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path + 'settings.db';
-
-    // Open/create the database at a given path
-    var settingsDatabase =
-        await openDatabase(path, version: 1, onCreate: _createDb);
-    return settingsDatabase;
-  }
-
-  void _createDb(Database db, int newVersion) async {
-    await db.execute(
-        'CREATE TABLE $settingsTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $restoreDate TEXT, '
-        '$lastSyncDate TEXT)');
-  }
-
-  Future<int> insertSetiings(Settings settings) async {
-    Database db = await this.database;
-    var result = await db.insert(
-      settingsTable,
-      settings.toMap(),
-    );
-
-    return result;
-  }
-
-  Future<int> updateSettings(Settings settings) async {
-    var db = await this.database;
-    var result = await db.update(settingsTable, settings.toMap(),
-        where: '$colId = ?', whereArgs: [settings.id]);
-    return result;
-  }
-
-  Future<int> getRestore() async {
-    Database db = await this.database;
-    List<Map<String, dynamic>> x = await db
-        .rawQuery('SELECT $restoreDate from $settingsTable WHERE $colId = 1');
-    int result = Sqflite.firstIntValue(x);
-    return result;
-  }
-
-  Future<int> getSync() async {
-    Database db = await this.database;
-    List<Map<String, dynamic>> x = await db
-        .rawQuery('SELECT $lastSyncDate from $settingsTable WHERE $colId = 1');
-    int result = Sqflite.firstIntValue(x);
-    return result;
-  }
-
-  Future<List<String>> getSettings() async {
-    var restoreDate = await getRestore();
-    var lastSyncDate = await getSync();
-    List settingsList = [restoreDate, lastSyncDate];
-    return settingsList;
   }
 }

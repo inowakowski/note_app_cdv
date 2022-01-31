@@ -150,7 +150,8 @@ class _LogInPage extends State<LogInPage> {
 // ignore: non_constant_identifier_names
 bool LoginState = !LoginState ?? false;
 
-bool logIn(BuildContext context) {
+//TODO: Add login logic to the app.
+void logIn(BuildContext context) {
   final snackBar = SnackBar(
     content: const Text(
       'Logged in successfully',

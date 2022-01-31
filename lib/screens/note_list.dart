@@ -3,8 +3,9 @@ import 'dart:io';
 // import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
+import 'package:notes_app/db_helper/db_settings.dart';
 import 'package:notes_app/modal_class/notes.dart';
-import 'package:notes_app/modal_class/settings.dart';
+// import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/screens/note_detail.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_app/screens/search_note.dart';
@@ -86,14 +87,6 @@ class NoteListState extends State<NoteList> {
               //     context,
               //     MaterialPageRoute(
               //         builder: (context) => SettingsPage("Settings")));
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.update,
-            ),
-            onPressed: () {
-              updateListView();
             },
           ),
         ],
@@ -206,26 +199,13 @@ class NoteListState extends State<NoteList> {
   }
 
   void navigateToSettings() async {
-    // bool result = await
-    Navigator.push(context,
+    bool result = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => SettingsPage("Settings")));
 
-    // if (result == true) {
-    //   updateSettingsView();
-    // }
+    if (result == true) {
+      updateListView();
+    }
   }
-
-  // void updateSettingsView() {
-  //   final Future<Database> dbFuture = settingsHelper.initializeDatabase();
-  //   dbFuture.then((database) {
-  //     Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
-  //     settingsListFuture.then((settingsList) {
-  //       setState(() {
-  //         this.settingsList = settingsList;
-  //       });
-  //     });
-  //   });
-  // }
 
   void updateListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
