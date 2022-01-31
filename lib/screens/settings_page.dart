@@ -1,13 +1,14 @@
 import 'dart:convert';
+// import 'dart:html';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:azblob/azblob.dart';
 import 'package:notes_app/screens/login_page.dart';
-import 'package:notes_app/screens/note_list.dart';
+// import 'package:notes_app/screens/note_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/modal_class/notes.dart';
@@ -36,7 +37,7 @@ class SettingsPageState extends State<SettingsPage> {
   String restoreDate;
   Color statusColor;
   Color restoreColor;
-  var user = 'user0';
+  String username = '/user0';
   SettingsPageState(this.appBarTitle);
   var isLogIn = true;
 
@@ -99,7 +100,7 @@ class SettingsPageState extends State<SettingsPage> {
                     padding: const EdgeInsets.all(20.0),
                     child: MaterialButton(
                       onPressed: () {
-                        isLogIn ? restoreFromAzure('') : null;
+                        isLogIn ? restoreFromAzure(username) : null;
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -145,7 +146,7 @@ class SettingsPageState extends State<SettingsPage> {
                     padding: const EdgeInsets.all(20.0),
                     child: MaterialButton(
                       onPressed: () {
-                        isLogIn ? syncNotes() : null;
+                        isLogIn ? exportToAzure(username) : null;
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -225,7 +226,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   //TODO: Export notes to Azure - done
 
-  exportToAzure() async {
+  exportToAzure(String username) async {
     try {
       String path = await getDatabasesPath();
       String fileName = '$path/notes.db';
@@ -236,7 +237,7 @@ class SettingsPageState extends State<SettingsPage> {
           'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
 
       await storage.putBlob(
-        '/$container/user0/$fileName',
+        '/$container$username/$fileName',
         body: content,
       );
       setState(() {
@@ -282,23 +283,31 @@ class SettingsPageState extends State<SettingsPage> {
 
       http.Response response = await http.get(url);
       String content = response.body;
-      print('Dwl Content: $content');
+      // print('Dwl Content: $content');
       String replace = content
           .replaceAll('}{', ';')
           .replaceAllMapped(RegExp(r'\{|\}'), (Match m) => '');
-      print('Dwl Replace: ' + replace);
       List<String> contentList = replace.split(';');
-      print('Dwl ContentList: $contentList');
 
       for (int i = 0; i < contentList.length; i++) {
-        List<String> json = contentList[i].split(',');
+        List<String> jsonList = contentList[i].split(',');
 
-        Note note = Note.fromMapObject(json);
-
-        await helper.updateNote(note);
-        for (int j = 0; j < json.length; j++) {
-          print('Dwl Json[$j]: ${json[j]}');
-        }
+        Map<String, dynamic> note = {
+          // 'id': id,
+          'title': jsonList[1].split(':')[1],
+          'description': jsonList[2].split(':')[1],
+          'color': int.parse(jsonList[3].split(':')[1]),
+          'date': jsonList[4].split(':')[1] +
+              ',' +
+              jsonList[5].split(':')[0] +
+              ':' +
+              jsonList[5].split(':')[1] +
+              ':' +
+              jsonList[5].split(':')[2],
+          'image': jsonList[6].split(':')[1],
+        };
+        print('Dwl Note: $note');
+        await helper.insertNote(Note.fromMapObject(note));
       }
       setState(() {
         var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
@@ -356,9 +365,6 @@ class SettingsPageState extends State<SettingsPage> {
   //   moveToLastScreen();
   // }
 
-  void syncNotes() {
-    exportToAzure();
-  }
 }
 
 void logInAction(BuildContext context) {
