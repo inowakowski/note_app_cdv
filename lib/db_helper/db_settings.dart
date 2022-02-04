@@ -52,22 +52,32 @@ class SettingsDB {
 
   Future<int> insertLastSyncDate(String date) async {
     Database db = await this.database;
-    var result = await db.rawInsert(
-        'INSERT INTO $settingsTable($lastSyncDate) VALUES (?)', [date]);
+    // var result = await db
+    //     .rawInsert('INSERT INTO $settingsTable($lastSyncDate) VALUES ($date)');
+    var result = await db.insert(settingsTable, {
+      lastSyncDate: date,
+    });
     return result;
   }
 
   Future<int> updateLastSyncDate(String date, int id) async {
     var db = await this.database;
-    var result = await db.rawUpdate(
-        'UPDATE $settingsTable SET $lastSyncDate = $date WHERE $colId = $id');
+    // var result = await db.rawUpdate(
+    //     'UPDATE $settingsTable SET $lastSyncDate = $date WHERE $colId = $id');
+    var result = await db.update(
+        settingsTable,
+        {
+          lastSyncDate: date,
+        },
+        where: '$colId = ?',
+        whereArgs: [id]);
     return result;
   }
 
   Future<int> insertRestoreDate(String date) async {
     Database db = await this.database;
-    var result = await db.rawInsert(
-        'INSERT INTO $settingsTable($restoreDate) VALUES (?)', [date]);
+    var result = await db
+        .rawInsert('INSERT INTO $settingsTable($restoreDate) VALUES ($date)');
     return result;
   }
 
@@ -75,6 +85,12 @@ class SettingsDB {
     var db = await this.database;
     var result = await db.rawUpdate(
         'UPDATE $settingsTable SET $restoreDate = $date WHERE $colId = $id');
+    return result;
+  }
+
+  Future<int> insert(Settings dane) async {
+    Database db = await this.database;
+    var result = await db.insert(settingsTable, dane.toMap());
     return result;
   }
 

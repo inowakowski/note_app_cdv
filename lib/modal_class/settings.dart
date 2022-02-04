@@ -25,7 +25,7 @@ class Settings {
     return map;
   }
 
-  Settings.fromMapObject(Map<String, dynamic> map) {
+  Settings.fromMap(Map<String, dynamic> map) {
     this.id = map['id'];
     this.restoreDate = map['restore_date'];
     this.lastSyncDate = map['last_sync_date'];

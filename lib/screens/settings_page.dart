@@ -7,7 +7,6 @@ import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/db_helper/db_settings.dart';
 import 'package:azblob/azblob.dart';
 import 'package:notes_app/screens/login_page.dart';
-// import 'package:notes_app/screens/note_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/modal_class/notes.dart';
@@ -36,16 +35,18 @@ class SettingsPageState extends State<SettingsPage> {
   Color statusColor;
   Color restoreColor;
   String username = '/user0';
+
   SettingsPageState(this.appBarTitle);
   var isLogIn = true;
 
   @override
   Widget build(BuildContext context) {
+    // var settings = Settings();
+    // print('paderech: ' + settings.lastSyncDate);
+    updateSettingsView();
+
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
-    var id = settingsHelper.getId();
-    print('id ErrSave : $id');
-    updateSettingsView();
 
     return WillPopScope(
         onWillPop: () async {
@@ -240,7 +241,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   //export to Azure
 
-  exportToAzure(String username) async {
+  void exportToAzure(String username) async {
     try {
       String path = await getDatabasesPath();
       String fileName = '$path/notes.db';
@@ -254,26 +255,29 @@ class SettingsPageState extends State<SettingsPage> {
         '/$container$username/$fileName',
         body: content,
       );
-      setState(() async {
-        var lastSyncDateDB = DateFormat.yMMMd().format(DateTime.now()) +
-            ' ' +
-            DateFormat.jms().format(DateTime.now());
-        lastSyncDate = lastSyncDateDB.replaceAll(' ', '\n');
+      _saveLastSyncDate();
+      setState(
+        () {
+          var lastSyncDateDB = DateFormat.yMMMd().format(DateTime.now()) +
+              ' | ' +
+              DateFormat.jms().format(DateTime.now());
+          lastSyncDate = lastSyncDateDB.replaceAll(' | ', '\n');
+          print('paderech state: $lastSyncDateDB - $lastSyncDate');
 
-        _saveLastSyncDate(lastSyncDateDB);
-
-        statusColor = Colors.green[600];
-      });
+          statusColor = Colors.green[600];
+        },
+      );
     } on AzureStorageException catch (ex) {
       setState(() {
         lastSyncDate = 'Azure Storage Exception';
         statusColor = Colors.red;
       });
-      print(ex.message);
+      print('paderech ex: $ex');
     } catch (err) {
       setState(() {
         lastSyncDate = 'Unknown Error';
         statusColor = Colors.red;
+        print('paderech err: $err');
       });
       print(err);
     }
@@ -282,7 +286,7 @@ class SettingsPageState extends State<SettingsPage> {
 //restore from Azure
   HttpClient httpClient = new HttpClient();
 
-  restoreFromAzure(String username) async {
+  void restoreFromAzure(String username) async {
     try {
       String container = 'notter-project';
       Uri url = Uri.parse(
@@ -317,7 +321,7 @@ class SettingsPageState extends State<SettingsPage> {
       }
       setState(() async {
         var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
-            ' ' +
+            ' | ' +
             DateFormat.jms().format(DateTime.now());
         restoreDate = restoreStateDB.replaceAll(' ', '\n');
 
@@ -326,7 +330,6 @@ class SettingsPageState extends State<SettingsPage> {
         restoreColor = Colors.green[600];
       });
       restoreColor = Colors.green[600];
-      print('Dwl Restore Success');
     } on HttpException catch (ex) {
       setState(() {
         restoreDate = 'Http Exception';
@@ -348,36 +351,49 @@ class SettingsPageState extends State<SettingsPage> {
       Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
       settingsListFuture.then((settingsList) {
         setState(() {
-          this.restoreDate = settingsList[0].restoreDate;
-          this.lastSyncDate = settingsList[0].lastSyncDate;
-          this.isLogIn = settingsList[0].isLogin;
-          this.username = settingsList[0].userName;
+          this.restoreDate = settingsList[1].restoreDate;
+          this.lastSyncDate = settingsList[1].lastSyncDate;
+          this.isLogIn = settingsList[1].isLogin;
+          this.username = settingsList[1].userName;
         });
       });
     });
   }
 
   void _saveRestoreDate(String state) async {
-    try {
-      if (settings.id != null) {
-        await settingsHelper.updateRestoreDate(state, 1);
-      } else {
-        await settingsHelper.insertRestoreDate(state);
-      }
-    } catch (e) {
-      print('ErrSave RD: $e');
-    }
+    // settings.restoreDate = DateFormat.yMMMd().format(DateTime.now()) +
+    //     ' | ' +
+    //     DateFormat.jms().format(DateTime.now());
+
+    // try {
+    //   if (settings.id != null) {
+    //     await settingsHelper.updateRestoreDate(state, 1);
+    //   } else {
+    //     await settingsHelper.insertRestoreDate(state);
+    //   }
+    // } catch (e) {
+    //   print('paderech RD: $e');
+    // }
   }
 
-  void _saveLastSyncDate(String state) async {
+  void _saveLastSyncDate() async {
+    print('paderech function 0: $settings');
+    settings.lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
+        ' | ' +
+        DateFormat.jms().format(DateTime.now());
+    print('paderech function 0: ' + settings.lastSyncDate);
     try {
+      print('paderech function 2: $settings');
       if (settings.id != null) {
-        await settingsHelper.updateLastSyncDate(state, 1);
+        // await settingsHelper.updateLastSyncDate(state, 1);
+        print('paderech update: $settings');
       } else {
-        await settingsHelper.insertLastSyncDate(state);
+        // await settingsHelper.insertLastSyncDate(state);
+        // await settingsHelper.insert(settings);
+        print('paderech insert: $settings');
       }
     } catch (e) {
-      print('ErrSave LSD: $e');
+      print('paderech LSD: $e');
     }
   }
 
