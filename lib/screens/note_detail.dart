@@ -11,7 +11,6 @@ import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/modal_class/notes.dart';
 import 'package:notes_app/utils/widgets.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
@@ -41,26 +40,10 @@ class NoteDetailState extends State<NoteDetail> {
   String get date => null;
 
   File image;
-  String b64Image;
-
-  Widget _buildImage(BuildContext context) {
-    return new FutureBuilder(
-      future: convertBase64ToImage(b64Image),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return Container(); // or some other placeholder
-        return new Image.file(snapshot.data);
-      },
-    );
-  }
+  String b64Image = '';
 
   @override
   Widget build(BuildContext context) {
-    print('IMGF note: ${note.image}');
-
-    if (note.image != '') {
-      // _buildImage();
-    }
-
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
 
@@ -116,14 +99,7 @@ class NoteDetailState extends State<NoteDetail> {
                 Expanded(
                   child: ListView(
                     children: <Widget>[
-                      if (image == null)
-                        Container()
-                      else
-                        // _buildImage(context),
-                        Image.file(
-                          this.image,
-                          fit: BoxFit.cover,
-                        ),
+                      _getImage(),
                       Padding(
                         padding: EdgeInsets.all(16.0),
                         child: TextField(
@@ -382,37 +358,29 @@ class NoteDetailState extends State<NoteDetail> {
         source: ImageSource.gallery,
       );
       if (image == null) return;
-      final base64 = await convertImageToBase64(image.path);
-      final imageFile = await convertBase64ToImage(base64);
+      File imageFile = File(image.path);
+      final base64 = base64UrlEncode(imageFile.readAsBytesSync());
       setState(() {
-        this.image = imageFile;
+        this.b64Image = base64;
       });
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
     }
   }
 
-  // Future<File> saveImage(String imagePath) async {
-  //   final directory = await getApplicationDocumentsDirectory();
-  //   final name = path.basename(imagePath);
-  //   final image = File('${directory.path}/$name');
-  //   print(File(imagePath).copy(image.path));
-  //   return File(imagePath).copy(image.path);
-  // }
-
-  Future convertImageToBase64(String imagePath) async {
-    File file = File(imagePath);
-    // this.fileName = file.path.split('/').last;
-    String base64Image = base64UrlEncode(file.readAsBytesSync());
-    return base64Image;
-  }
-
-  Future convertBase64ToImage(String base64Image) async {
-    var dateTime = DateTime.now().hashCode.toString(); //image_$dateTime
-    File file = File(
-        '${(await getApplicationDocumentsDirectory()).path}/image_$dateTime.jpg');
-    print('IMGF file B2I: $file');
-    file.writeAsBytesSync(base64Decode(base64Image));
-    return File(file.path);
+  Widget _getImage() {
+    if (note.image != '') {
+      return Image.memory(
+        base64Decode(note.image),
+        fit: BoxFit.cover,
+      );
+    } else if (this.b64Image != '') {
+      return Image.memory(
+        base64Decode(this.b64Image),
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Container();
+    }
   }
 }

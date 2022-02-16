@@ -246,7 +246,7 @@ class SettingsPageState extends State<SettingsPage> {
     helper.deleteAll();
     final snackBar = SnackBar(
       content: const Text(
-        'Notes delete successfully',
+        'Deleted all notes successfully',
         style: TextStyle(color: Colors.white),
       ),
     );
@@ -258,9 +258,7 @@ class SettingsPageState extends State<SettingsPage> {
   void exportToAzure(String username) async {
     try {
       String notePath = await getDatabasesPath();
-      // final storagePath = await getApplicationDocumentsDirectory();
       String fileName = '$notePath/notes.db';
-      // String imageFile = '${storagePath.path}/';
 
       List contentList = await helper.getNoteMapList();
       String content = contentList.join();
@@ -272,10 +270,6 @@ class SettingsPageState extends State<SettingsPage> {
         '/$container$username/$fileName',
         body: content,
       );
-      // await storage.putBlob(
-      //   '/$container$username/$imageFile',
-      //   body: imageFile,
-      // );
       _saveLastSyncDate();
       setState(
         () {
@@ -283,7 +277,7 @@ class SettingsPageState extends State<SettingsPage> {
               ' | ' +
               DateFormat.jms().format(DateTime.now());
           lastSyncDate = lastSyncDateDB.replaceAll(' | ', '\n');
-          print('paderech state: $lastSyncDateDB - $lastSyncDate');
+          print('IMGF state: $lastSyncDateDB - $lastSyncDate');
 
           statusColor = Colors.green[600];
         },
@@ -293,12 +287,12 @@ class SettingsPageState extends State<SettingsPage> {
         lastSyncDate = 'Azure Storage Exception';
         statusColor = Colors.red;
       });
-      print('paderech ex: $ex');
+      print('IMGF ex: $ex');
     } catch (err) {
       setState(() {
         lastSyncDate = 'Unknown Error';
         statusColor = Colors.red;
-        print('paderech err: $err');
+        print('IMGF err: $err');
       });
       print(err);
     }
@@ -336,7 +330,7 @@ class SettingsPageState extends State<SettingsPage> {
               jsonList[5].split(':')[1] +
               ':' +
               jsonList[5].split(':')[2],
-          'image': jsonList[6].split(':')[1],
+          'image': jsonList[6].split(':')[1].replaceAll(' ', ''),
         };
         await helper.insertNote(Note.fromMapObject(note));
       }

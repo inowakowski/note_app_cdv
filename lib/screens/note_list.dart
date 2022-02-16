@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 // import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class NoteListState extends State<NoteList> {
   Widget build(BuildContext context) {
     if (noteList == null) {
       noteList = [];
+      print('IMGF noteList is null');
       updateListView();
     }
     final brightness = Theme.of(context).brightness;
@@ -146,17 +148,7 @@ class NoteListState extends State<NoteList> {
                 borderRadius: BorderRadius.circular(10.0)),
             child: Column(
               children: <Widget>[
-                // this.noteList[index].image != ''
-                //     ? ClipRRect(
-                //         borderRadius: BorderRadius.only(
-                //           topLeft: Radius.circular(10.0),
-                //           topRight: Radius.circular(10.0),
-                //         ),
-                //         child: Image.file(
-                //           File(this.noteList[index].image),
-                //         ),
-                //       )
-                //     : Container(),
+                _getImage(index),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -198,6 +190,21 @@ class NoteListState extends State<NoteList> {
       mainAxisSpacing: 4.0,
       crossAxisSpacing: 4.0,
     );
+  }
+
+  Widget _getImage(int index) {
+    if (this.noteList[index].image != '') {
+      return ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
+          ),
+          child: Image.memory(
+            base64Decode(this.noteList[index].image),
+          ));
+    } else {
+      return Container();
+    }
   }
 
   void navigateToDetail(Note note, String title) async {

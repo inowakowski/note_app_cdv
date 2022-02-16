@@ -1,12 +1,9 @@
-// import 'dart:typed_data';
-
 class Note {
   int _id;
   String _title;
   String _description;
   String _date;
   String _image;
-  // Uint8List _image;
   int _color;
 
   Note(this._title, this._date, this._color, this._image, [this._description]);
