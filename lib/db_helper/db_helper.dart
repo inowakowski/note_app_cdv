@@ -12,7 +12,7 @@ class DatabaseHelper {
   String colId = 'id';
   String colTitle = 'title';
   String colDescription = 'description';
-  // Uint8List colImage = 'image';
+  String colImage = 'image';
   String colColor = 'color';
   String colDate = 'date';
 
@@ -47,7 +47,7 @@ class DatabaseHelper {
   void _createDb(Database db, int newVersion) async {
     await db.execute(
       'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
-      '$colDescription TEXT, $colColor INTEGER,$colDate TEXT)',
+      '$colDescription TEXT, $colColor INTEGER,$colDate TEXT, $colImage TEXT)',
     ); //, $colImage BLOB
   }
 

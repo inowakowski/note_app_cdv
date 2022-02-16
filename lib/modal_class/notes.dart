@@ -1,11 +1,12 @@
-import 'dart:typed_data';
+// import 'dart:typed_data';
 
 class Note {
   int _id;
   String _title;
   String _description;
   String _date;
-  Uint8List _image;
+  String _image;
+  // Uint8List _image;
   int _color;
 
   Note(this._title, this._date, this._color, this._image, [this._description]);
@@ -19,7 +20,7 @@ class Note {
 
   String get description => _description;
 
-  Uint8List get image => _image;
+  String get image => _image;
 
   int get color => _color;
   String get date => _date;
@@ -36,7 +37,7 @@ class Note {
     }
   }
 
-  set image(Uint8List newImage) {
+  set image(String newImage) {
     this._image = newImage;
   }
 
@@ -74,6 +75,6 @@ class Note {
     this._color = map['color'];
     this._date = map['date'];
     this._date = map['date'];
-    this._image = map['picture'];
+    this._image = map['image'];
   }
 }

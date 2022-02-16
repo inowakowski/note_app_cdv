@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
           headline4: TextStyle(color: Colors.blue, fontSize: 24),
           headline5: TextStyle(color: Colors.white, fontSize: 24),
           bodyText2: TextStyle(color: Colors.white, fontSize: 20),
-          bodyText1: TextStyle(color: Colors.white, fontSize: 18),
+          bodyText1: TextStyle(color: Colors.white, fontSize: 16),
           subtitle2: TextStyle(color: Colors.white, fontSize: 14),
           subtitle1: TextStyle(color: Colors.white, fontSize: 12),
         ),

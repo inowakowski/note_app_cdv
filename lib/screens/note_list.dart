@@ -110,7 +110,7 @@ class NoteListState extends State<NoteList> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          navigateToDetail(Note('', '', 0, null), 'Add Note');
+          navigateToDetail(Note('', '', 0, ''), 'Add Note');
         },
         tooltip: 'Add Note',
         child: Icon(
@@ -137,15 +137,26 @@ class NoteListState extends State<NoteList> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            padding: EdgeInsets.all(8.0),
+            // padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
                 color: isDarkMode
                     ? colorsDark[this.noteList[index].color]
                     : colors[this.noteList[index].color],
                 border: Border.all(width: 1, color: Colors.grey),
-                borderRadius: BorderRadius.circular(8.0)),
+                borderRadius: BorderRadius.circular(10.0)),
             child: Column(
               children: <Widget>[
+                // this.noteList[index].image != ''
+                //     ? ClipRRect(
+                //         borderRadius: BorderRadius.only(
+                //           topLeft: Radius.circular(10.0),
+                //           topRight: Radius.circular(10.0),
+                //         ),
+                //         child: Image.file(
+                //           File(this.noteList[index].image),
+                //         ),
+                //       )
+                //     : Container(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[

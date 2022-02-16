@@ -7,9 +7,11 @@ import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/db_helper/db_settings.dart';
 import 'package:azblob/azblob.dart';
 import 'package:notes_app/screens/login_page.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/modal_class/notes.dart';
+import 'package:notes_app/screens/note_detail.dart';
 import 'package:http/http.dart' as http;
 
 class SettingsPage extends StatefulWidget {
@@ -214,7 +216,8 @@ class SettingsPageState extends State<SettingsPage> {
                 padding: const EdgeInsets.all(20.0),
                 child: MaterialButton(
                   onPressed: () {
-                    helper.deleteAll();
+                    // helper.deleteAll();
+                    deleteNotes(context);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
@@ -239,12 +242,26 @@ class SettingsPageState extends State<SettingsPage> {
     Navigator.pop(context, true);
   }
 
+  void deleteNotes(BuildContext context) {
+    helper.deleteAll();
+    final snackBar = SnackBar(
+      content: const Text(
+        'Notes delete successfully',
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   //export to Azure
 
   void exportToAzure(String username) async {
     try {
-      String path = await getDatabasesPath();
-      String fileName = '$path/notes.db';
+      String notePath = await getDatabasesPath();
+      // final storagePath = await getApplicationDocumentsDirectory();
+      String fileName = '$notePath/notes.db';
+      // String imageFile = '${storagePath.path}/';
+
       List contentList = await helper.getNoteMapList();
       String content = contentList.join();
       String container = 'notter-project';
@@ -255,6 +272,10 @@ class SettingsPageState extends State<SettingsPage> {
         '/$container$username/$fileName',
         body: content,
       );
+      // await storage.putBlob(
+      //   '/$container$username/$imageFile',
+      //   body: imageFile,
+      // );
       _saveLastSyncDate();
       setState(
         () {

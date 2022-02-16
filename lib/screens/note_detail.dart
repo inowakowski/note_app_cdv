@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,6 @@ import 'package:notes_app/modal_class/notes.dart';
 import 'package:notes_app/utils/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
@@ -41,8 +41,26 @@ class NoteDetailState extends State<NoteDetail> {
   String get date => null;
 
   File image;
+  String b64Image;
+
+  Widget _buildImage(BuildContext context) {
+    return new FutureBuilder(
+      future: convertBase64ToImage(b64Image),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return Container(); // or some other placeholder
+        return new Image.file(snapshot.data);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('IMGF note: ${note.image}');
+
+    if (note.image != '') {
+      // _buildImage();
+    }
+
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
 
@@ -101,8 +119,9 @@ class NoteDetailState extends State<NoteDetail> {
                       if (image == null)
                         Container()
                       else
+                        // _buildImage(context),
                         Image.file(
-                          image,
+                          this.image,
                           fit: BoxFit.cover,
                         ),
                       Padding(
@@ -339,6 +358,11 @@ class NoteDetailState extends State<NoteDetail> {
     note.date = DateFormat.yMMMd().format(DateTime.now()) +
         ' ' +
         DateFormat.jms().format(DateTime.now());
+    if (this.image != null) {
+      note.image = this.b64Image;
+    } else {
+      note.image = '';
+    }
 
     if (note.id != null) {
       await helper.updateNote(note);
@@ -358,7 +382,8 @@ class NoteDetailState extends State<NoteDetail> {
         source: ImageSource.gallery,
       );
       if (image == null) return;
-      final imageFile = await saveImage(image.path);
+      final base64 = await convertImageToBase64(image.path);
+      final imageFile = await convertBase64ToImage(base64);
       setState(() {
         this.image = imageFile;
       });
@@ -367,11 +392,27 @@ class NoteDetailState extends State<NoteDetail> {
     }
   }
 
-  Future<File> saveImage(String imagePath) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final name = path.basename(imagePath);
-    final image = File('${directory.path}/$name');
-    print(File(imagePath).copy(image.path));
-    return File(imagePath).copy(image.path);
+  // Future<File> saveImage(String imagePath) async {
+  //   final directory = await getApplicationDocumentsDirectory();
+  //   final name = path.basename(imagePath);
+  //   final image = File('${directory.path}/$name');
+  //   print(File(imagePath).copy(image.path));
+  //   return File(imagePath).copy(image.path);
+  // }
+
+  Future convertImageToBase64(String imagePath) async {
+    File file = File(imagePath);
+    // this.fileName = file.path.split('/').last;
+    String base64Image = base64UrlEncode(file.readAsBytesSync());
+    return base64Image;
+  }
+
+  Future convertBase64ToImage(String base64Image) async {
+    var dateTime = DateTime.now().hashCode.toString(); //image_$dateTime
+    File file = File(
+        '${(await getApplicationDocumentsDirectory()).path}/image_$dateTime.jpg');
+    print('IMGF file B2I: $file');
+    file.writeAsBytesSync(base64Decode(base64Image));
+    return File(file.path);
   }
 }
