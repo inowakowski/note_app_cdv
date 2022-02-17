@@ -13,6 +13,8 @@ class Settings {
     this.userName,
   });
 
+  get username => null;
+
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
     if (id != null) {

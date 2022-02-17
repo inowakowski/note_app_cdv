@@ -39,13 +39,18 @@ class NoteDetailState extends State<NoteDetail> {
 
   String get date => null;
 
-  File image;
   String b64Image = '';
 
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
+
+    if (note.image != '') {
+      setState(() {
+        this.b64Image = note.image;
+      });
+    }
 
     titleController.text = note.title;
     descriptionController.text = note.description;
@@ -144,7 +149,13 @@ class NoteDetailState extends State<NoteDetail> {
                             icon: Icon(
                               Icons.add_photo_alternate_outlined,
                             ),
-                            onPressed: () => pickImageNote(),
+                            onPressed: () => pickImageNote(ImageSource.gallery),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.camera_alt_outlined,
+                            ),
+                            onPressed: () => pickImageNote(ImageSource.camera),
                           ),
                           IconButton(
                             icon: Icon(
@@ -334,7 +345,7 @@ class NoteDetailState extends State<NoteDetail> {
     note.date = DateFormat.yMMMd().format(DateTime.now()) +
         ' ' +
         DateFormat.jms().format(DateTime.now());
-    if (this.image != null) {
+    if (this.b64Image != null) {
       note.image = this.b64Image;
     } else {
       note.image = '';
@@ -352,10 +363,10 @@ class NoteDetailState extends State<NoteDetail> {
     moveToLastScreen();
   }
 
-  Future pickImageNote() async {
+  Future pickImageNote(ImageSource source) async {
     try {
       var image = await ImagePicker.platform.getImage(
-        source: ImageSource.gallery,
+        source: source,
       );
       if (image == null) return;
       File imageFile = File(image.path);

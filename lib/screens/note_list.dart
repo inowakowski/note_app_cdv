@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/db_helper/db_settings.dart';
 import 'package:notes_app/modal_class/notes.dart';
-// import 'package:notes_app/modal_class/settings.dart';
+import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/screens/note_detail.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_app/screens/search_note.dart';
@@ -26,20 +26,21 @@ class NoteListState extends State<NoteList> {
   SettingsDB settingsHelper = SettingsDB();
 
   List<Note> noteList;
-  List settingsList;
+  List<Settings> settingsList;
   int count = 0;
   int axisCount = 2;
-  File image;
-  // Uint8List _bytesImage;
-  // String base64Image;
 
   @override
   Widget build(BuildContext context) {
     if (noteList == null) {
       noteList = [];
-      print('IMGF noteList is null');
       updateListView();
+      if (settingsList == null) {
+        settingsList = [];
+        updateSettingsView();
+      }
     }
+
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
 
@@ -217,8 +218,10 @@ class NoteListState extends State<NoteList> {
   }
 
   void navigateToSettings() async {
-    bool result = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => SettingsPage("Settings")));
+    bool result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SettingsPage(settingsList[0], "Settings")));
 
     if (result == true) {
       updateListView();
@@ -233,6 +236,19 @@ class NoteListState extends State<NoteList> {
         setState(() {
           this.noteList = noteList;
           this.count = noteList.length;
+        });
+      });
+    });
+  }
+
+  void updateSettingsView() {
+    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
+    dbFuture.then((database) {
+      final Future<List<Settings>> settingsListFuture =
+          settingsHelper.getSettingsList();
+      settingsListFuture.then((settingsList) {
+        setState(() {
+          this.settingsList = settingsList;
         });
       });
     });

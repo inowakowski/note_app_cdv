@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NoteKeeper',
+      title: 'Notter',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // primarySwatch: Colors.white,
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           headline4: TextStyle(color: Colors.blue, fontSize: 22),
           headline5: TextStyle(color: Colors.black, fontSize: 24),
           bodyText2: TextStyle(color: Colors.black, fontSize: 20),
-          bodyText1: TextStyle(color: Colors.black, fontSize: 18),
+          bodyText1: TextStyle(color: Colors.black, fontSize: 16),
           subtitle2: TextStyle(color: Colors.black, fontSize: 14),
           subtitle1: TextStyle(color: Colors.black, fontSize: 12),
         ),
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
           // onSurface: Colors.white,
           onSurface: Colors.grey[900],
           // secondaryVariant: Colors.white,
-          secondaryVariant: Colors.grey[900],
+          // secondaryVariant: Colors.grey[900],
           brightness: Brightness.dark,
         ),
         appBarTheme: AppBarTheme(
@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
             actionsIconTheme: IconThemeData(color: Colors.white),
             iconTheme: IconThemeData(color: Colors.white)),
         textTheme: TextTheme(
-          headline4: TextStyle(color: Colors.blue, fontSize: 24),
+          headline4: TextStyle(color: Colors.blue, fontSize: 22),
           headline5: TextStyle(color: Colors.white, fontSize: 24),
           bodyText2: TextStyle(color: Colors.white, fontSize: 20),
           bodyText1: TextStyle(color: Colors.white, fontSize: 16),

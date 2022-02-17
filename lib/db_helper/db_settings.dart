@@ -94,6 +94,12 @@ class SettingsDB {
     return result;
   }
 
+  Future<int> update(Settings dane) async {
+    Database db = await this.database;
+    var result = await db.update(settingsTable, dane.toMap());
+    return result;
+  }
+
   Future<List<Map<String, dynamic>>> getLogin() async {
     var db = await this.database;
     var result = await db.rawQuery('SELECT $isLogin FROM $settingsTable');
@@ -125,12 +131,20 @@ class SettingsDB {
     return result[0]['id'];
   }
 
-  Future<List<Settings>> getSettings() async {
-    var restoreDate = await getRestore();
-    var lastSyncDate = await getSync();
-    var isLogin = await getLogin();
-    var userName = await getUserName();
-    List settingsList = [restoreDate, lastSyncDate, isLogin, userName];
+  Future<List<Map<String, dynamic>>> getSettingsMapList() async {
+    Database db = await this.database;
+    var result = await db.query(settingsTable);
+    return result;
+  }
+
+  Future<List<Settings>> getSettingsList() async {
+    var settingsMapList = await getSettingsMapList();
+
+    List<Settings> settingsList = [];
+    for (int i = 0; i < settingsMapList.length; i++) {
+      settingsList.add(Settings.fromMap(settingsMapList[i]));
+    }
+
     return settingsList;
   }
 }

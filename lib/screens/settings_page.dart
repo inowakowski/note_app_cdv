@@ -7,21 +7,20 @@ import 'package:notes_app/db_helper/db_helper.dart';
 import 'package:notes_app/db_helper/db_settings.dart';
 import 'package:azblob/azblob.dart';
 import 'package:notes_app/screens/login_page.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:notes_app/modal_class/settings.dart';
 import 'package:notes_app/modal_class/notes.dart';
-import 'package:notes_app/screens/note_detail.dart';
 import 'package:http/http.dart' as http;
 
 class SettingsPage extends StatefulWidget {
   final String appBarTitle;
-  // SettingsPage({Key key, this.appBarTitle, this.note}) : super(key: key);
-  SettingsPage(this.appBarTitle, {String title});
+  final Settings settings;
+
+  SettingsPage(this.settings, this.appBarTitle);
 
   @override
   State<StatefulWidget> createState() {
-    return SettingsPageState(this.appBarTitle);
+    return SettingsPageState(this.settings, this.appBarTitle);
   }
 }
 
@@ -32,20 +31,27 @@ class SettingsPageState extends State<SettingsPage> {
   String appBarTitle;
   Note note;
   Settings settings;
+  List<Settings> settingsList;
   String lastSyncDate;
   String restoreDate;
   Color statusColor;
   Color restoreColor;
   String username = '/user0';
 
-  SettingsPageState(this.appBarTitle);
+  SettingsPageState(this.settings, this.appBarTitle);
   var isLogIn = true;
 
   @override
   Widget build(BuildContext context) {
-    // var settings = Settings();
-    // print('paderech: ' + settings.lastSyncDate);
-    updateSettingsView();
+    if (settingsList == null) {
+      settingsList = [];
+    }
+
+    print('IMGF id settings: ' + settings.id.toString());
+    print('IMGF restoreDate: ' + settings.restoreDate.toString());
+    print('IMGF lastSyncDate: ' + settings.lastSyncDate);
+    print('IMGF username: ' + settings.username.toString());
+    print('IMGF isLogin: ' + settings.isLogin.toString());
 
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
@@ -101,13 +107,14 @@ class SettingsPageState extends State<SettingsPage> {
                         SizedBox(
                           height: 10.0,
                         ),
-                        Text(
-                          isLogIn
-                              ? restoreDate ?? 'Not restored'
-                              : 'Not logged in',
-                          style: TextStyle(color: restoreColor),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        _getRestoreDate(),
+                        // Text(
+                        //   isLogIn
+                        //       ? settings.restoreDate ?? 'Not restored'
+                        //       : 'Not logged in',
+                        //   style: TextStyle(color: restoreColor),
+                        //   overflow: TextOverflow.ellipsis,
+                        // ),
                       ],
                     ),
                   ),
@@ -149,13 +156,14 @@ class SettingsPageState extends State<SettingsPage> {
                         SizedBox(
                           height: 10.0,
                         ),
-                        Text(
-                          isLogIn
-                              ? lastSyncDate ?? 'Not synced'
-                              : 'Not logged in',
-                          style: TextStyle(color: statusColor),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        _getLastSyncDate()
+                        // Text(
+                        //   isLogIn
+                        //       ? settings.lastSyncDate ?? 'Not synced'
+                        //       : 'Not logged in',
+                        //   style: TextStyle(color: statusColor),
+                        //   overflow: TextOverflow.ellipsis,
+                        // ),
                       ],
                     ),
                   ),
@@ -238,6 +246,45 @@ class SettingsPageState extends State<SettingsPage> {
         ));
   }
 
+  Widget _getLastSyncDate() {
+    // if (settingsList[0].isLogin == 'true') {}
+    if (settings.lastSyncDate == null) {
+      return Text(
+        'Not synced',
+        style: TextStyle(color: statusColor),
+      );
+    } else {
+      return Text(
+        settings.lastSyncDate.replaceAll(' | ', '\n'),
+        style: TextStyle(color: statusColor),
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+  }
+
+  Widget _getRestoreDate() {
+    // if (settingsList[0].isLogin == 'true') {}
+    if (settings.restoreDate == null) {
+      return Text(
+        'Not restored',
+        style: TextStyle(color: restoreColor),
+      );
+    } else {
+      return Text(
+        settings.restoreDate.replaceAll(' | ', '\n'),
+      );
+    }
+  }
+
+  Widget _getUserName() {
+    if (settings.userName == null) {
+      return Text(
+        'Not logged in',
+        style: TextStyle(color: statusColor),
+      );
+    }
+  }
+
   void moveToLastScreen() {
     Navigator.pop(context, true);
   }
@@ -270,18 +317,17 @@ class SettingsPageState extends State<SettingsPage> {
         '/$container$username/$fileName',
         body: content,
       );
-      _saveLastSyncDate();
-      setState(
-        () {
-          var lastSyncDateDB = DateFormat.yMMMd().format(DateTime.now()) +
-              ' | ' +
-              DateFormat.jms().format(DateTime.now());
-          lastSyncDate = lastSyncDateDB.replaceAll(' | ', '\n');
-          print('IMGF state: $lastSyncDateDB - $lastSyncDate');
 
-          statusColor = Colors.green[600];
-        },
-      );
+      var lastSyncDateDB = DateFormat.yMMMd().format(DateTime.now()) +
+          ' | ' +
+          DateFormat.jms().format(DateTime.now());
+      _saveLastSyncDate(lastSyncDateDB);
+      setState(() {
+        lastSyncDate = lastSyncDateDB.replaceAll(' | ', '\n');
+        print('IMGF state: $lastSyncDateDB - $lastSyncDate');
+
+        statusColor = Colors.green[600];
+      });
     } on AzureStorageException catch (ex) {
       setState(() {
         lastSyncDate = 'Azure Storage Exception';
@@ -309,7 +355,6 @@ class SettingsPageState extends State<SettingsPage> {
 
       http.Response response = await http.get(url);
       String content = response.body;
-      // print('Dwl Content: $content');
       String replace = content
           .replaceAll('}{', ';')
           .replaceAllMapped(RegExp(r'\{|\}'), (Match m) => '');
@@ -320,8 +365,8 @@ class SettingsPageState extends State<SettingsPage> {
 
         Map<String, dynamic> note = {
           // 'id': id,
-          'title': jsonList[1].split(':')[1],
-          'description': jsonList[2].split(':')[1],
+          'title': jsonList[1].split(': ')[1],
+          'description': jsonList[2].split(': ')[1],
           'color': int.parse(jsonList[3].split(':')[1]),
           'date': jsonList[4].split(':')[1] +
               ',' +
@@ -334,13 +379,12 @@ class SettingsPageState extends State<SettingsPage> {
         };
         await helper.insertNote(Note.fromMapObject(note));
       }
+      var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
+          ' | ' +
+          DateFormat.jms().format(DateTime.now());
+      _saveRestoreDate(restoreStateDB);
       setState(() async {
-        var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
-            ' | ' +
-            DateFormat.jms().format(DateTime.now());
-        restoreDate = restoreStateDB.replaceAll(' ', '\n');
-
-        _saveRestoreDate(restoreStateDB);
+        settingsList[0].restoreDate = restoreStateDB.replaceAll(' | ', '\n');
 
         restoreColor = Colors.green[600];
       });
@@ -360,55 +404,27 @@ class SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  void updateSettingsView() {
-    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Settings>> settingsListFuture = settingsHelper.getSettings();
-      settingsListFuture.then((settingsList) {
-        setState(() {
-          this.restoreDate = settingsList[1].restoreDate;
-          this.lastSyncDate = settingsList[1].lastSyncDate;
-          this.isLogIn = settingsList[1].isLogin;
-          this.username = settingsList[1].userName;
-        });
-      });
-    });
-  }
-
   void _saveRestoreDate(String state) async {
-    // settings.restoreDate = DateFormat.yMMMd().format(DateTime.now()) +
-    //     ' | ' +
-    //     DateFormat.jms().format(DateTime.now());
-
-    // try {
-    //   if (settings.id != null) {
-    //     await settingsHelper.updateRestoreDate(state, 1);
-    //   } else {
-    //     await settingsHelper.insertRestoreDate(state);
-    //   }
-    // } catch (e) {
-    //   print('paderech RD: $e');
-    // }
-  }
-
-  void _saveLastSyncDate() async {
-    print('paderech function 0: $settings');
-    settings.lastSyncDate = DateFormat.yMMMd().format(DateTime.now()) +
-        ' | ' +
-        DateFormat.jms().format(DateTime.now());
-    print('paderech function 0: ' + settings.lastSyncDate);
     try {
-      print('paderech function 2: $settings');
-      if (settings.id != null) {
-        // await settingsHelper.updateLastSyncDate(state, 1);
-        print('paderech update: $settings');
+      if (settingsList[0].id != null) {
+        await settingsHelper.updateRestoreDate(state, settingsList[0].id);
       } else {
-        // await settingsHelper.insertLastSyncDate(state);
-        // await settingsHelper.insert(settings);
-        print('paderech insert: $settings');
+        await settingsHelper.insertRestoreDate(state);
       }
     } catch (e) {
-      print('paderech LSD: $e');
+      print('IMGF RD: $e');
+    }
+  }
+
+  void _saveLastSyncDate(String state) async {
+    try {
+      if (settingsList[0].id != null) {
+        await settingsHelper.updateLastSyncDate(state, settingsList[0].id);
+      } else {
+        await settingsHelper.insertLastSyncDate(state);
+      }
+    } catch (e) {
+      print('IMGF LSD: $e');
     }
   }
 
