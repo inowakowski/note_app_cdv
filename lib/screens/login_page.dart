@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/screens/signup_page.dart';
+// import 'package:notes_app/screens/settings_page.dart';
+import 'package:notes_app/db_helper/db_settings.dart';
 
 class LogInPage extends StatefulWidget {
   final String appBarTitle;
@@ -18,6 +20,9 @@ class _LogInPage extends State<LogInPage> {
   _LogInPage(this.appBarTitle);
   var _userPasswordController;
   bool _passwordVisible = false;
+  final _userNameController = TextEditingController();
+
+  SettingsDB settingsHelper = SettingsDB();
 
   void _toggle() {
     setState(() {
@@ -47,6 +52,7 @@ class _LogInPage extends State<LogInPage> {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
+                controller: _userNameController,
                 style: (TextStyle(
                   fontSize: 16,
                 )),
@@ -145,21 +151,25 @@ class _LogInPage extends State<LogInPage> {
       ),
     );
   }
-}
 
 // ignore: non_constant_identifier_names
-bool LoginState = !LoginState ?? false;
+// bool LoginState = !LoginState ?? false;
+  void moveToLastScreen() {
+    Navigator.pop(context, false);
+  }
 
 //TODO: Add login logic to the app.
-void logIn(BuildContext context) {
-  final snackBar = SnackBar(
-    content: const Text(
-      'Logged in successfully',
-      style: TextStyle(color: Colors.white),
-    ),
-  );
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  void logIn(BuildContext context) {
+    final snackBar = SnackBar(
+      content: const Text(
+        'Logged in successfully',
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-  Navigator.pop(context, LoginState = true);
-  // return isLogin = true;
+    var username = this._userNameController.text;
+    // Navigator.pop(context, true);
+    Navigator.pop(context, [true, username]);
+  }
 }

@@ -16,11 +16,13 @@ class SettingsPage extends StatefulWidget {
   final String appBarTitle;
   final Settings settings;
 
-  SettingsPage(this.settings, this.appBarTitle);
+  // SettingsPage(this.appBarTitle, {String title});
+  SettingsPage(this.settings, this.appBarTitle, {String title});
 
   @override
   State<StatefulWidget> createState() {
     return SettingsPageState(this.settings, this.appBarTitle);
+    // return SettingsPageState(this.appBarTitle);
   }
 }
 
@@ -36,22 +38,42 @@ class SettingsPageState extends State<SettingsPage> {
   String restoreDate;
   Color statusColor;
   Color restoreColor;
-  String username = '/user0';
+  String username;
+  int countSettings = 0;
 
   SettingsPageState(this.settings, this.appBarTitle);
-  var isLogIn = true;
+  // SettingsPageState(this.appBarTitle);
+
+  bool isLogIn = false;
 
   @override
   Widget build(BuildContext context) {
-    if (settingsList == null) {
-      settingsList = [];
-    }
+    // if (settingsList == null) {
+    //   settingsList = [];
+    //   updateSettingsList();
+    // }
 
-    print('IMGF id settings: ' + settings.id.toString());
-    print('IMGF restoreDate: ' + settings.restoreDate.toString());
-    print('IMGF lastSyncDate: ' + settings.lastSyncDate);
-    print('IMGF username: ' + settings.username.toString());
-    print('IMGF isLogin: ' + settings.isLogin.toString());
+    // if (username != null) {
+    //   settings.userName = username;
+    // } else {
+    //   username = settings.userName;
+    // }
+
+    if (isLogIn != null) {
+      settings.isLogin = this.isLogIn;
+    } else {
+      this.isLogIn = settings.isLogin;
+    }
+    settingsHelper.insert(settings);
+
+    // print('imgf settings id: ' + settings.id.toString());
+    print('imgf settings lastSync: ' + settings.lastSyncDate);
+    print('imgf settings restore: ' + settings.restoreDate);
+    print('imgf settings username: ' + settings.userName);
+    print('imgf settings isLogin: ' + settings.isLogin.toString());
+
+    // print('imgf count: ' + countSettings.toString());'
+    // print('imgf settings length: ' + settingsList.length.toString());
 
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
@@ -75,187 +97,200 @@ class SettingsPageState extends State<SettingsPage> {
                   moveToLastScreen();
                 }),
           ),
-          body: ListView(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  'If you want sync or restore notes from other device, you need to login. ',
-                  textAlign: TextAlign.justify,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  isLogIn
-                      ? 'You are logged in as: ' + username.replaceAll('/', '')
-                      : 'You are not logged in',
-                  textAlign: TextAlign.justify,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Last restore:',
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        _getRestoreDate(),
-                        // Text(
-                        //   isLogIn
-                        //       ? settings.restoreDate ?? 'Not restored'
-                        //       : 'Not logged in',
-                        //   style: TextStyle(color: restoreColor),
-                        //   overflow: TextOverflow.ellipsis,
-                        // ),
-                      ],
-                    ),
+          body: Container(
+            child: ListView(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text(
+                    'If you want sync or restore notes from other device, you need to login. ',
+                    textAlign: TextAlign.justify,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: MaterialButton(
-                      onPressed: () {
-                        isLogIn ? restoreFromAzure(username) : null;
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 5.0, bottom: 5.0, left: 20.0, right: 20.0),
-                        child: Text(
-                          'Restore',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: _getUserName(),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Last restore:',
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          _getRestoreDate(),
+                          // Text(
+                          //   isLogIn
+                          //       ? settingsList[0].restoreDate ??
+                          //           'Not restored'
+                          //       : 'Not logged in',
+                          //   style: TextStyle(color: restoreColor),
+                          //   overflow: TextOverflow.ellipsis,
+                          // ),
+                        ],
                       ),
-                      disabledColor: Colors.grey,
-                      color: Colors.blue,
-                      padding: EdgeInsets.all(5.0),
-                      splashColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(300.0)),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Last export:',
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: MaterialButton(
+                        onPressed: () {
+                          isLogIn ? restoreFromAzure(username) : null;
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 5.0, bottom: 5.0, left: 20.0, right: 20.0),
+                          child: Text(
+                            'Restore',
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
                         ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        _getLastSyncDate()
-                        // Text(
-                        //   isLogIn
-                        //       ? settings.lastSyncDate ?? 'Not synced'
-                        //       : 'Not logged in',
-                        //   style: TextStyle(color: statusColor),
-                        //   overflow: TextOverflow.ellipsis,
-                        // ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: MaterialButton(
-                      onPressed: () {
-                        isLogIn ? exportToAzure(username) : null;
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 5.0, bottom: 5.0, left: 26.0, right: 26.0),
-                        child: Text(
-                          'Export',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
+                        disabledColor: Colors.grey,
+                        color: Colors.blue,
+                        padding: EdgeInsets.all(5.0),
+                        splashColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(300.0)),
                       ),
-                      disabledColor: Colors.grey,
-                      color: Colors.blue,
-                      padding: EdgeInsets.all(5.0),
-                      splashColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(300.0)),
                     ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: MaterialButton(
-                  onPressed: () {
-                    isLogIn ? logOutAction() : logInAction(context);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Text(
-                      isLogIn ? 'Log out' : 'Log in',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                  ),
-                  color: isLogIn
-                      ? isDarkMode
-                          ? Colors.grey[850]
-                          : Colors.white
-                      : Colors.blue,
-                  padding: EdgeInsets.all(5.0),
-                  splashColor: Colors.blueAccent,
-                  shape: isLogIn
-                      ? RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(300.0),
-                          side: BorderSide(color: Colors.blue, width: 2.0),
-                        )
-                      : RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(300.0)),
+                  ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: MaterialButton(
-                  onPressed: () {
-                    // helper.deleteAll();
-                    deleteNotes(context);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Text(
-                      'Delete all notes',
-                      style: Theme.of(context).textTheme.headline6,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Last export:',
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          _getLastSyncDate()
+                          // Text(
+                          //   isLogIn
+                          //       ? settingsList[0].lastSyncDate ?? 'Not synced'
+                          //       : 'Not logged in',
+                          //   style: TextStyle(color: statusColor),
+                          //   overflow: TextOverflow.ellipsis,
+                          // ),
+                        ],
+                      ),
                     ),
-                  ),
-                  color: Colors.blue,
-                  padding: EdgeInsets.all(5.0),
-                  splashColor: Colors.blueAccent,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(300.0)),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: MaterialButton(
+                        onPressed: () {
+                          isLogIn ? exportToAzure(username) : null;
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 5.0, bottom: 5.0, left: 26.0, right: 26.0),
+                          child: Text(
+                            'Export',
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
+                        ),
+                        disabledColor: Colors.grey,
+                        color: Colors.blue,
+                        padding: EdgeInsets.all(5.0),
+                        splashColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(300.0)),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: _logInButton(isDarkMode)),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: MaterialButton(
+                    onPressed: () {
+                      // helper.deleteAll();
+                      deleteNotes(context);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Text(
+                        'Delete all notes',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    color: Colors.blue,
+                    padding: EdgeInsets.all(5.0),
+                    splashColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(300.0)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ));
   }
 
+  Widget _logInButton(bool isDarkMode) {
+    if (isLogIn) {
+      return MaterialButton(
+          onPressed: () {
+            logOutAction();
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Text(
+              'Log out',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+          color: isDarkMode ? Colors.grey[850] : Colors.white,
+          padding: EdgeInsets.all(5.0),
+          splashColor: Colors.blueAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(300.0),
+            side: BorderSide(color: Colors.blue, width: 2.0),
+          ));
+    } else {
+      return MaterialButton(
+        onPressed: () {
+          logInAction(context);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Text(
+            'Log in',
+            style: Theme.of(context).textTheme.headline6,
+          ),
+        ),
+        color: Colors.blue,
+        padding: EdgeInsets.all(5.0),
+        splashColor: Colors.blueAccent,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(300.0)),
+      );
+    }
+  }
+
   Widget _getLastSyncDate() {
     // if (settingsList[0].isLogin == 'true') {}
-    if (settings.lastSyncDate == null) {
+    if (this.countSettings == 0) {
       return Text(
         'Not synced',
         style: TextStyle(color: statusColor),
       );
     } else {
       return Text(
-        settings.lastSyncDate.replaceAll(' | ', '\n'),
+        settingsList[0].lastSyncDate.replaceAll(' | ', '\n'),
         style: TextStyle(color: statusColor),
         overflow: TextOverflow.ellipsis,
       );
@@ -264,7 +299,7 @@ class SettingsPageState extends State<SettingsPage> {
 
   Widget _getRestoreDate() {
     // if (settingsList[0].isLogin == 'true') {}
-    if (settings.restoreDate == null) {
+    if (this.countSettings == 0) {
       return Text(
         'Not restored',
         style: TextStyle(color: restoreColor),
@@ -277,15 +312,32 @@ class SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _getUserName() {
-    if (settings.userName == null) {
+    if (this.isLogIn == false) {
       return Text(
-        'Not logged in',
+        'You are NOT logged in.',
         style: TextStyle(color: statusColor),
+      );
+    } else if (this.isLogIn == true) {
+      return Text(
+        // 'You are logged in as: test',
+        'You are logged in as: \n' + settings.userName,
+        textAlign: TextAlign.justify,
       );
     }
   }
 
-  void moveToLastScreen() {
+  void moveToLastScreen() async {
+    // try {
+    //   if (settings.id != null) {
+    //     await settingsHelper.update(settings);
+    //   } else {
+    //     await settingsHelper.insert(settings);
+    //   }
+    // } catch (e) {
+    //   print(e);
+    // }
+    _saveSettings();
+
     Navigator.pop(context, true);
   }
 
@@ -300,7 +352,7 @@ class SettingsPageState extends State<SettingsPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  //export to Azure
+//export to Azure
 
   void exportToAzure(String username) async {
     try {
@@ -314,7 +366,7 @@ class SettingsPageState extends State<SettingsPage> {
           'DefaultEndpointsProtocol=https;AccountName=notterprojectuser;AccountKey=ugCVzp4ihOOjoHtZzv9OhYbWpaeLl2Vv3hJ5Vt1y12e0I2NAxIQsSXelVE45Rm13UkwwKHJKT+9dIyh1TCYTHA==;EndpointSuffix=core.windows.net');
 
       await storage.putBlob(
-        '/$container$username/$fileName',
+        '/$container/$username/$fileName',
         body: content,
       );
 
@@ -322,9 +374,9 @@ class SettingsPageState extends State<SettingsPage> {
           ' | ' +
           DateFormat.jms().format(DateTime.now());
       _saveLastSyncDate(lastSyncDateDB);
+
       setState(() {
         lastSyncDate = lastSyncDateDB.replaceAll(' | ', '\n');
-        print('IMGF state: $lastSyncDateDB - $lastSyncDate');
 
         statusColor = Colors.green[600];
       });
@@ -345,6 +397,7 @@ class SettingsPageState extends State<SettingsPage> {
   }
 
 //restore from Azure
+
   HttpClient httpClient = new HttpClient();
 
   void restoreFromAzure(String username) async {
@@ -382,13 +435,14 @@ class SettingsPageState extends State<SettingsPage> {
       var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
           ' | ' +
           DateFormat.jms().format(DateTime.now());
-      _saveRestoreDate(restoreStateDB);
+      // _saveRestoreDate(restoreStateDB);
+
       setState(() async {
-        settingsList[0].restoreDate = restoreStateDB.replaceAll(' | ', '\n');
+        settings.restoreDate = restoreStateDB.replaceAll(' | ', '\n');
+        this.restoreDate = restoreStateDB.replaceAll(' | ', '\n');
 
         restoreColor = Colors.green[600];
       });
-      restoreColor = Colors.green[600];
     } on HttpException catch (ex) {
       setState(() {
         restoreDate = 'Http Exception';
@@ -406,40 +460,96 @@ class SettingsPageState extends State<SettingsPage> {
 
   void _saveRestoreDate(String state) async {
     try {
-      if (settingsList[0].id != null) {
-        await settingsHelper.updateRestoreDate(state, settingsList[0].id);
+      if (settings.id != null) {
+        await settingsHelper.updateRestoreDate(state, settings.id);
       } else {
         await settingsHelper.insertRestoreDate(state);
       }
     } catch (e) {
-      print('IMGF RD: $e');
+      print(e);
     }
   }
 
   void _saveLastSyncDate(String state) async {
+    // try {
+    //   if (settings.id != null) {
+    //     await settingsHelper.updateLastSyncDate(state, settings.id);
+    //   } else {
+    //     await settingsHelper.insertLastSyncDate(state);
+    //   }
+    // } catch (e) {
+    //   print('IMGF LSD: $e');
+    // }
+    // settings.lastSyncDate = state;
+  }
+
+  void _saveSettings() async {
     try {
-      if (settingsList[0].id != null) {
-        await settingsHelper.updateLastSyncDate(state, settingsList[0].id);
+      if (settings.id != null) {
+        await settingsHelper.update(settings);
+        print('IMGF saved updated' + settings.toString());
       } else {
-        await settingsHelper.insertLastSyncDate(state);
+        await settingsHelper.insert(settings);
+        print('IMGF saved inserted' + settings.toString());
       }
+      print('IMGF saved');
     } catch (e) {
-      print('IMGF LSD: $e');
+      print('IMGF SS: $e');
     }
   }
 
   //TODO: Add a function to logout
-  logOutAction() {}
+  logOutAction() {
+    final snackBar = SnackBar(
+      content: const Text(
+        'Log out successfully',
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    setState(() {
+      settings.isLogin = false;
+      this.isLogIn = false;
+      settings.userName = '';
+      this.username = '';
+    });
+  }
 
   void logInAction(BuildContext context) async {
-    Navigator.push(
+    var result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => LogInPage('Log in'),
       ),
     );
-  }
 
-  //TODO: Add a function to check if the user is logged in or not.
-  logInCheck() {}
+    if (result[0] == true) {
+      setState(() {
+        settings.isLogin = true;
+        this.isLogIn = true;
+        settings.userName = result[1];
+      });
+    } else {
+      setState(() {
+        settings.isLogin = false;
+        this.isLogIn = false;
+      });
+      // updateSettingsList();
+    }
+    if (settings.id != 0) {
+      await settingsHelper.updateIsLogin(this.isLogIn, settings.id);
+      print('IMGF: updateIsLogin');
+      await settingsHelper.updateUsername(this.username, settings.id);
+      print('IMGF: updateUsername');
+      // updateSettingsList();
+    } else {
+      await settingsHelper.insertIsLogin(this.isLogIn, 1);
+      print('IMGF: insertIsLogin');
+      await settingsHelper.insertUsername(this.username, 1);
+      print('IMGF: insertUsername');
+    }
+    // updateSettingsList();
+    print('IMGF: updateSettingsList');
+  }
 }

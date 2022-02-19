@@ -50,53 +50,72 @@ class SettingsDB {
     );
   }
 
+  Future<int> insert(Settings settings) async {
+    Database db = await this.database;
+    var result = await db.insert(
+      settingsTable,
+      settings.toMap(),
+    );
+    print('imgf result:' + result.toString());
+    return result;
+  }
+
+  Future<int> update(Settings settings) async {
+    Database db = await this.database;
+    var result = await db.update(settingsTable, settings.toMap(),
+        where: '$colId = ?', whereArgs: [settings.id]);
+    return result;
+  }
+
   Future<int> insertLastSyncDate(String date) async {
     Database db = await this.database;
-    // var result = await db
-    //     .rawInsert('INSERT INTO $settingsTable($lastSyncDate) VALUES ($date)');
-    var result = await db.insert(settingsTable, {
-      lastSyncDate: date,
-    });
+    var result = await db.insert(settingsTable, {lastSyncDate: date});
     return result;
   }
 
   Future<int> updateLastSyncDate(String date, int id) async {
     var db = await this.database;
-    // var result = await db.rawUpdate(
-    //     'UPDATE $settingsTable SET $lastSyncDate = $date WHERE $colId = $id');
-    var result = await db.update(
-        settingsTable,
-        {
-          lastSyncDate: date,
-        },
-        where: '$colId = ?',
-        whereArgs: [id]);
+    var result = await db.update(settingsTable, {lastSyncDate: date},
+        where: '$colId = ?', whereArgs: [id]);
     return result;
   }
 
   Future<int> insertRestoreDate(String date) async {
     Database db = await this.database;
-    var result = await db
-        .rawInsert('INSERT INTO $settingsTable($restoreDate) VALUES ($date)');
+    var result = await db.insert(settingsTable, {restoreDate: date});
     return result;
   }
 
   Future<int> updateRestoreDate(String date, int id) async {
     var db = await this.database;
-    var result = await db.rawUpdate(
-        'UPDATE $settingsTable SET $restoreDate = $date WHERE $colId = $id');
+    var result = await db.update(settingsTable, {restoreDate: date},
+        where: '$colId = ?', whereArgs: [id]);
     return result;
   }
 
-  Future<int> insert(Settings dane) async {
+  Future<bool> insertIsLogin(bool dane, int id) async {
     Database db = await this.database;
-    var result = await db.insert(settingsTable, dane.toMap());
+    var result = await db.insert(settingsTable, {isLogin: dane, colId: id});
+    return result.toInt() > 0 ? true : false;
+  }
+
+  Future<bool> updateIsLogin(bool dane, int id) async {
+    Database db = await this.database;
+    var result = await db.update(settingsTable, {isLogin: dane},
+        where: '$colId = ?', whereArgs: [id]);
+    return result.toInt() > 0 ? true : false;
+  }
+
+  Future<int> insertUsername(String dane, int id) async {
+    Database db = await this.database;
+    var result = await db.insert(settingsTable, {userName: dane, colId: id});
     return result;
   }
 
-  Future<int> update(Settings dane) async {
+  Future<int> updateUsername(String dane, int id) async {
     Database db = await this.database;
-    var result = await db.update(settingsTable, dane.toMap());
+    var result = await db.update(settingsTable, {userName: dane},
+        where: '$colId = ?', whereArgs: [id]);
     return result;
   }
 
@@ -133,15 +152,16 @@ class SettingsDB {
 
   Future<List<Map<String, dynamic>>> getSettingsMapList() async {
     Database db = await this.database;
-    var result = await db.query(settingsTable);
+    var result = await db.rawQuery('SELECT * from $settingsTable');
     return result;
   }
 
   Future<List<Settings>> getSettingsList() async {
     var settingsMapList = await getSettingsMapList();
+    int count = settingsMapList.length;
 
     List<Settings> settingsList = [];
-    for (int i = 0; i < settingsMapList.length; i++) {
+    for (int i = 0; i < count; i++) {
       settingsList.add(Settings.fromMap(settingsMapList[i]));
     }
 

@@ -65,6 +65,7 @@ class DatabaseHelper {
       noteTable,
       note.toMap(),
     );
+    print('imgf note result: $result');
     return result;
   }
 
@@ -87,6 +88,8 @@ class DatabaseHelper {
   Future<int> deleteAll() async {
     var db = await this.database;
     int result = await db.rawDelete('DELETE FROM $noteTable');
+    db.rawDelete(
+        'DELETE FROM SQLITE_SEQUENCE SET SEQ=0 WHERE name = $noteTable');
     return result;
   }
 

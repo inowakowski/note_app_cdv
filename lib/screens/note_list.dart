@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 // import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:notes_app/db_helper/db_helper.dart';
@@ -27,6 +26,7 @@ class NoteListState extends State<NoteList> {
 
   List<Note> noteList;
   List<Settings> settingsList;
+  int countSettings = 0;
   int count = 0;
   int axisCount = 2;
 
@@ -35,11 +35,14 @@ class NoteListState extends State<NoteList> {
     if (noteList == null) {
       noteList = [];
       updateListView();
-      if (settingsList == null) {
-        settingsList = [];
-        updateSettingsView();
-      }
     }
+
+    if (settingsList == null) {
+      settingsList = [];
+      updateSettingsView();
+    }
+
+    print('imgf settingsList : ' + settingsList.toString());
 
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
@@ -85,11 +88,9 @@ class NoteListState extends State<NoteList> {
               Icons.settings,
             ),
             onPressed: () {
-              navigateToSettings();
-              // Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //         builder: (context) => SettingsPage("Settings")));
+              settingsList.length == 0
+                  ? navigateToSettings(Settings('', '', false, ''), 'Settings')
+                  : navigateToSettings(settingsList[0], 'Settings');
             },
           ),
         ],
@@ -217,14 +218,13 @@ class NoteListState extends State<NoteList> {
     }
   }
 
-  void navigateToSettings() async {
-    bool result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => SettingsPage(settingsList[0], "Settings")));
+  void navigateToSettings(Settings settings, String title) async {
+    bool result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => SettingsPage(settings, title)));
 
     if (result == true) {
       updateListView();
+      print('imgf result: ' + result.toString());
     }
   }
 
@@ -249,6 +249,7 @@ class NoteListState extends State<NoteList> {
       settingsListFuture.then((settingsList) {
         setState(() {
           this.settingsList = settingsList;
+          this.countSettings = settingsList.length;
         });
       });
     });

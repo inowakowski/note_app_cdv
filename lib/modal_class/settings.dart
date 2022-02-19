@@ -5,13 +5,13 @@ class Settings {
   bool isLogin;
   String userName;
 
-  Settings({
-    this.id,
+  Settings(
+    // this.id,
     this.restoreDate,
     this.lastSyncDate,
     this.isLogin,
     this.userName,
-  });
+  );
 
   get username => null;
 
@@ -23,7 +23,7 @@ class Settings {
     map['restore_date'] = restoreDate;
     map['last_sync_date'] = lastSyncDate;
     map['is_login'] = isLogin;
-    map['user_name'] = userName;
+    map['username'] = userName;
     return map;
   }
 
@@ -32,6 +32,6 @@ class Settings {
     this.restoreDate = map['restore_date'];
     this.lastSyncDate = map['last_sync_date'];
     this.isLogin = map['is_login'];
-    this.userName = map['user_name'];
+    this.userName = map['username'];
   }
 }
