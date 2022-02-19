@@ -71,7 +71,6 @@ class Note {
     this._description = map['description'];
     this._color = map['color'];
     this._date = map['date'];
-    this._date = map['date'];
     this._image = map['image'];
   }
 }

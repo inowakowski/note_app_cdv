@@ -35,14 +35,20 @@ class NoteListState extends State<NoteList> {
     if (noteList == null) {
       noteList = [];
       updateListView();
+      updateSettingsView();
     }
+    test();
 
     if (settingsList == null) {
       settingsList = [];
-      updateSettingsView();
     }
+    // settingsHelper.deleteAllSetiings();
+    databaseHelper.getNoteMapList();
+    databaseHelper.getNoteList();
 
-    print('imgf settingsList : ' + settingsList.toString());
+    settingsHelper.getSettingsMapList();
+    settingsHelper.getSettingsList();
+    print('imgf20 settingsList : ' + settingsList.toString());
 
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
@@ -89,7 +95,7 @@ class NoteListState extends State<NoteList> {
             ),
             onPressed: () {
               settingsList.length == 0
-                  ? navigateToSettings(Settings('', '', false, ''), 'Settings')
+                  ? navigateToSettings(Settings('', '', ''), 'Settings')
                   : navigateToSettings(settingsList[0], 'Settings');
             },
           ),
@@ -224,7 +230,7 @@ class NoteListState extends State<NoteList> {
 
     if (result == true) {
       updateListView();
-      print('imgf result: ' + result.toString());
+      updateSettingsView();
     }
   }
 
@@ -246,11 +252,22 @@ class NoteListState extends State<NoteList> {
     dbFuture.then((database) {
       final Future<List<Settings>> settingsListFuture =
           settingsHelper.getSettingsList();
-      settingsListFuture.then((settingsList) {
+      settingsListFuture.then((settingsLists) {
         setState(() {
-          this.settingsList = settingsList;
-          this.countSettings = settingsList.length;
+          this.settingsList = settingsLists;
+          this.countSettings = settingsLists.length;
         });
+        print('imgf length: ${settingsLists.length}');
+      });
+    });
+  }
+
+  void test() {
+    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
+    dbFuture.then((database) {
+      final Future<Settings> settingsFuture = settingsHelper.getSettings();
+      settingsFuture.then((settings) {
+        print('imgf settings: ${settings.toString()}');
       });
     });
   }

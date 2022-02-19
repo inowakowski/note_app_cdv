@@ -5,14 +5,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:notes_app/modal_class/settings.dart';
 
 class SettingsDB {
-  static SettingsDB _settingsHelper; // Singleton DatabaseHelper
+  static SettingsDB _settingsHelper;
   static Database _database;
 
   String settingsTable = 'settings_table';
   String restoreDate = 'restore_date';
   String lastSyncDate = 'last_sync_date';
   String colId = 'id';
-  String isLogin = 'is_login';
   String userName = 'username';
 
   SettingsDB._createInstance();
@@ -46,17 +45,18 @@ class SettingsDB {
   void _createDb(Database db, int newVersion) async {
     await db.execute(
       'CREATE TABLE $settingsTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $restoreDate TEXT, '
-      '$lastSyncDate TEXT, $isLogin BOOL, $userName TEXT)',
+      '$lastSyncDate TEXT, $userName TEXT)',
     );
   }
 
   Future<int> insert(Settings settings) async {
     Database db = await this.database;
+    // await db.delete(settingsTable);
     var result = await db.insert(
       settingsTable,
       settings.toMap(),
     );
-    print('imgf result:' + result.toString());
+    print('imgf2 result:' + result.toString());
     return result;
   }
 
@@ -67,61 +67,11 @@ class SettingsDB {
     return result;
   }
 
-  Future<int> insertLastSyncDate(String date) async {
-    Database db = await this.database;
-    var result = await db.insert(settingsTable, {lastSyncDate: date});
-    return result;
-  }
-
-  Future<int> updateLastSyncDate(String date, int id) async {
+  Future<int> deleteAllSetiings() async {
     var db = await this.database;
-    var result = await db.update(settingsTable, {lastSyncDate: date},
-        where: '$colId = ?', whereArgs: [id]);
-    return result;
-  }
-
-  Future<int> insertRestoreDate(String date) async {
-    Database db = await this.database;
-    var result = await db.insert(settingsTable, {restoreDate: date});
-    return result;
-  }
-
-  Future<int> updateRestoreDate(String date, int id) async {
-    var db = await this.database;
-    var result = await db.update(settingsTable, {restoreDate: date},
-        where: '$colId = ?', whereArgs: [id]);
-    return result;
-  }
-
-  Future<bool> insertIsLogin(bool dane, int id) async {
-    Database db = await this.database;
-    var result = await db.insert(settingsTable, {isLogin: dane, colId: id});
-    return result.toInt() > 0 ? true : false;
-  }
-
-  Future<bool> updateIsLogin(bool dane, int id) async {
-    Database db = await this.database;
-    var result = await db.update(settingsTable, {isLogin: dane},
-        where: '$colId = ?', whereArgs: [id]);
-    return result.toInt() > 0 ? true : false;
-  }
-
-  Future<int> insertUsername(String dane, int id) async {
-    Database db = await this.database;
-    var result = await db.insert(settingsTable, {userName: dane, colId: id});
-    return result;
-  }
-
-  Future<int> updateUsername(String dane, int id) async {
-    Database db = await this.database;
-    var result = await db.update(settingsTable, {userName: dane},
-        where: '$colId = ?', whereArgs: [id]);
-    return result;
-  }
-
-  Future<List<Map<String, dynamic>>> getLogin() async {
-    var db = await this.database;
-    var result = await db.rawQuery('SELECT $isLogin FROM $settingsTable');
+    int result = await db.rawDelete('DELETE FROM $settingsTable');
+    // db.rawDelete(
+    //     'DELETE FROM SQLITE_SEQUENCE SET SEQ=0 WHERE name = $settingsTable');
     return result;
   }
 
@@ -159,12 +109,42 @@ class SettingsDB {
   Future<List<Settings>> getSettingsList() async {
     var settingsMapList = await getSettingsMapList();
     int count = settingsMapList.length;
+    print('imgf2 count:' + count.toString());
 
     List<Settings> settingsList = [];
     for (int i = 0; i < count; i++) {
-      settingsList.add(Settings.fromMap(settingsMapList[i]));
+      print('imgf2 settingsMapList[$i]: ' +
+          settingsMapList[i].runtimeType.toString());
+      settingsList.add(Settings.fromMapObject(settingsMapList[i]));
+      print('imgf2 settingsList: ' + settingsList[i].toString());
     }
 
     return settingsList;
+  }
+
+  Future<Settings> getSettings() async {
+    var settingsMapList = await getSettingsMapList();
+    int count = settingsMapList.length;
+    print('imgf2 count:' + count.toString());
+
+    Settings settings;
+    if (count > 0) {
+      print('imgf2 settingsMapList[0]: ' + settingsMapList[0].toString());
+
+      Map<String, dynamic> settingsMap = {
+        'id': settingsMapList[0]['id'],
+        'restore_date': settingsMapList[0]['restore_date'],
+        'last_sync_date': settingsMapList[0]['last_sync_date'],
+        'is_login': settingsMapList[0]['is_login'],
+        'username': settingsMapList[0]['username'],
+      };
+
+      print('imgf2 settingsMap: ' + settingsMap.toString());
+
+      settings = Settings.fromMapObject(settingsMap);
+      print('imgf2 settings: ' + settings.toString());
+    }
+
+    return settings;
   }
 }

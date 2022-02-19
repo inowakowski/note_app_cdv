@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpPage extends StatefulWidget {
   final String appBarTitle;
@@ -44,24 +45,6 @@ class _SignUpPage extends State<SignUpPage> {
         child: ListView(
           children: [
             SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: TextFormField(
-                style: (TextStyle(
-                  fontSize: 16,
-                )),
-                decoration: InputDecoration(
-                  hintText: "Enter your nickname",
-                  icon: Icon(Icons.person_add_outlined),
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "* Required";
-                  } else
-                    return null;
-                },
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextFormField(
@@ -183,6 +166,10 @@ class _SignUpPage extends State<SignUpPage> {
 
 //TODO: Add sign up logic here
 void signUp(BuildContext context) {
+  // final response = http.post(
+  //   'http://localhost:8080/api/v1/users/signup',
+  // );
+
   final snackBar = SnackBar(
     content: const Text(
       'Sign Up Successful! You can now login.',

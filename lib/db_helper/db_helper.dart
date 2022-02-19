@@ -5,8 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:notes_app/modal_class/notes.dart';
 
 class DatabaseHelper {
-  static DatabaseHelper _databaseHelper; // Singleton DatabaseHelper
-  static Database _database; // Singleton Database
+  static DatabaseHelper _databaseHelper;
+  static Database _database;
 
   String noteTable = 'note_table';
   String colId = 'id';
@@ -16,7 +16,7 @@ class DatabaseHelper {
   String colColor = 'color';
   String colDate = 'date';
 
-  DatabaseHelper._createInstance(); // Named constructor to create instance of DatabaseHelper
+  DatabaseHelper._createInstance();
 
   factory DatabaseHelper() {
     if (_databaseHelper == null) {
@@ -55,6 +55,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getNoteMapList() async {
     Database db = await this.database;
     var result = await db.query(noteTable);
+
     return result;
   }
 
@@ -65,7 +66,6 @@ class DatabaseHelper {
       noteTable,
       note.toMap(),
     );
-    print('imgf note result: $result');
     return result;
   }
 
