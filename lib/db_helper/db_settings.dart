@@ -56,7 +56,6 @@ class SettingsDB {
       settingsTable,
       settings.toMap(),
     );
-    print('imgf2 result:' + result.toString());
     return result;
   }
 
@@ -109,42 +108,12 @@ class SettingsDB {
   Future<List<Settings>> getSettingsList() async {
     var settingsMapList = await getSettingsMapList();
     int count = settingsMapList.length;
-    print('imgf2 count:' + count.toString());
 
     List<Settings> settingsList = [];
     for (int i = 0; i < count; i++) {
-      print('imgf2 settingsMapList[$i]: ' +
-          settingsMapList[i].runtimeType.toString());
       settingsList.add(Settings.fromMapObject(settingsMapList[i]));
-      print('imgf2 settingsList: ' + settingsList[i].toString());
     }
 
     return settingsList;
-  }
-
-  Future<Settings> getSettings() async {
-    var settingsMapList = await getSettingsMapList();
-    int count = settingsMapList.length;
-    print('imgf2 count:' + count.toString());
-
-    Settings settings;
-    if (count > 0) {
-      print('imgf2 settingsMapList[0]: ' + settingsMapList[0].toString());
-
-      Map<String, dynamic> settingsMap = {
-        'id': settingsMapList[0]['id'],
-        'restore_date': settingsMapList[0]['restore_date'],
-        'last_sync_date': settingsMapList[0]['last_sync_date'],
-        'is_login': settingsMapList[0]['is_login'],
-        'username': settingsMapList[0]['username'],
-      };
-
-      print('imgf2 settingsMap: ' + settingsMap.toString());
-
-      settings = Settings.fromMapObject(settingsMap);
-      print('imgf2 settings: ' + settings.toString());
-    }
-
-    return settings;
   }
 }

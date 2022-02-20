@@ -160,6 +160,28 @@ class _LogInPage extends State<LogInPage> {
 
 //TODO: Add login logic to the app.
   void logIn(BuildContext context) {
+    // if (_userNameController.text.isEmpty ||
+    //     _userPasswordController.text.isEmpty) {
+    //   showDialog(
+    //       context: context,
+    //       builder: (BuildContext context) {
+    //         return AlertDialog(
+    //             shape: RoundedRectangleBorder(
+    //                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
+    //             title: Text("Error"),
+    //             content: Text("Please enter the email or password",
+    //                 style: Theme.of(context).textTheme.bodyText1),
+    //             actions: <Widget>[
+    //               TextButton(
+    //                 child: Text("OK"),
+    //                 onPressed: () {
+    //                   Navigator.of(context).pop();
+    //                 },
+    //               )
+    //             ]);
+    //       });
+    // } else if (_userNameController.text == 'user0@xyz.com' &&
+    //     _userPasswordController.text == 'password0') {
     final snackBar = SnackBar(
       content: const Text(
         'Logged in successfully',
@@ -169,7 +191,10 @@ class _LogInPage extends State<LogInPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     var username = this._userNameController.text;
-    // Navigator.pop(context, true);
     Navigator.pop(context, [true, username]);
+    // }
   }
+
+  void _userNameCheck(String username) {}
+  void _passwordCheck(String password) {}
 }

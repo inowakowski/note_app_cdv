@@ -37,7 +37,6 @@ class NoteListState extends State<NoteList> {
       updateListView();
       updateSettingsView();
     }
-    test();
 
     if (settingsList == null) {
       settingsList = [];
@@ -48,7 +47,6 @@ class NoteListState extends State<NoteList> {
 
     settingsHelper.getSettingsMapList();
     settingsHelper.getSettingsList();
-    print('imgf20 settingsList : ' + settingsList.toString());
 
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
@@ -257,17 +255,6 @@ class NoteListState extends State<NoteList> {
           this.settingsList = settingsLists;
           this.countSettings = settingsLists.length;
         });
-        print('imgf length: ${settingsLists.length}');
-      });
-    });
-  }
-
-  void test() {
-    final Future<Database> dbFuture = settingsHelper.initializeDatabase();
-    dbFuture.then((database) {
-      final Future<Settings> settingsFuture = settingsHelper.getSettings();
-      settingsFuture.then((settings) {
-        print('imgf settings: ${settings.toString()}');
       });
     });
   }

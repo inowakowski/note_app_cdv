@@ -40,6 +40,7 @@ class SettingsPageState extends State<SettingsPage> {
   Color restoreColor;
   String username = '';
   int countSettings = 0;
+  bool darkMode;
 
   SettingsPageState(this.settings, this.appBarTitle);
   // SettingsPageState(this.appBarTitle);
@@ -48,27 +49,6 @@ class SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (settingsList == null) {
-    //   settingsList = [];
-    //   updateSettingsList();
-    // }
-
-    // if (settings.lastSyncDate != null) {
-    //   setState(() {
-    //     settings.lastSyncDate = this.lastSyncDate;
-    //   });
-    // } else {
-    //   this.lastSyncDate = settings.lastSyncDate;
-    // }
-
-    // if (settings.restoreDate != null) {
-    //   setState(() {
-    //     settings.restoreDate = this.restoreDate;
-    //   });
-    // } else {
-    //   this.restoreDate = settings.restoreDate;
-    // }
-
     if (settings.userName != '') {
       setState(() {
         this.isLogIn = true;
@@ -90,6 +70,7 @@ class SettingsPageState extends State<SettingsPage> {
 
     final brightness = Theme.of(context).brightness;
     bool isDarkMode = brightness == Brightness.dark;
+    this.darkMode = isDarkMode;
 
     return WillPopScope(
         onWillPop: () async {
@@ -361,28 +342,90 @@ class SettingsPageState extends State<SettingsPage> {
   }
 
   void deleteNotes(BuildContext context) {
-    helper.deleteAll();
-    final snackBar = SnackBar(
-      content: const Text(
-        'Deleted all notes successfully',
-        style: TextStyle(color: Colors.white),
-      ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          title: Text(
+            "Delete all notes?",
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+          content: Text("Are you sure you want to delete all notes?",
+              style: Theme.of(context).textTheme.bodyText1),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                "No",
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Yes", style: Theme.of(context).textTheme.bodyText2),
+              onPressed: () {
+                Navigator.of(context).pop();
+                helper.deleteAll();
+                final snackBar = SnackBar(
+                  content: const Text(
+                    'Deleted all notes successfully',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+            ),
+          ],
+        );
+      },
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void deleteAllSettings(BuildContext context) {
-    settingsHelper.deleteAllSetiings();
-    settingsHelper.getSettingsMapList();
-    settingsHelper.getSettingsList();
-    final snackBar = SnackBar(
-      content: const Text(
-        'Deleted all settings successfully',
-        style: TextStyle(color: Colors.white),
-      ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          title: Text(
+            "Delete all settings?",
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+          content: Text("Are you sure you want to delete all settings?",
+              style: Theme.of(context).textTheme.bodyText1),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                "No",
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Yes", style: Theme.of(context).textTheme.bodyText2),
+              onPressed: () {
+                Navigator.of(context).pop();
+                settingsHelper.deleteAllSetiings();
+                final snackBar = SnackBar(
+                  content: const Text(
+                    'Deleted all settings successfully',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    Navigator.pop(context, true);
   }
 
 //export to Azure
@@ -417,12 +460,12 @@ class SettingsPageState extends State<SettingsPage> {
         lastSyncDate = 'Azure Storage Exception';
         statusColor = Colors.red;
       });
-      print('IMGF1 ex: $ex');
+      print('$ex');
     } catch (err) {
       setState(() {
         lastSyncDate = 'Unknown Error';
         statusColor = Colors.red;
-        print('IMGF1 err: $err');
+        print('$err');
       });
       print(err);
     }
@@ -435,8 +478,6 @@ class SettingsPageState extends State<SettingsPage> {
   void restoreFromAzure(String username) async {
     try {
       String container = 'notter-project';
-      // Uri url = Uri.parse(
-      //     'https://notterprojectuser.blob.core.windows.net/$container/$username//data/user/0/com.example.note_app_cdv/databases/notes.db');
       Uri url = Uri.https(
         'notterprojectuser.blob.core.windows.net',
         '/$container/$username//data/user/0/com.example.note_app_cdv/databases/notes.db',
@@ -474,13 +515,11 @@ class SettingsPageState extends State<SettingsPage> {
       var restoreStateDB = DateFormat.yMMMd().format(DateTime.now()) +
           ' - ' +
           DateFormat.jms().format(DateTime.now());
-      // _saveRestoreDate(restoreStateDB);
 
-      setState(() async {
-        restoreDate = restoreStateDB.replaceAll(' - ', '\n');
+      setState(() {
+        this.restoreDate = restoreStateDB.replaceAll(' - ', '\n');
         settings.restoreDate = restoreStateDB;
-
-        restoreColor = Colors.green[600];
+        this.restoreColor = Colors.green[600];
       });
     } on HttpException catch (ex) {
       setState(() {
@@ -499,18 +538,15 @@ class SettingsPageState extends State<SettingsPage> {
 
   void _saveSettings() async {
     settings.userName = this.username;
-    print('imgf _saveSettings: ' + settings.toString());
 
     if (settings.id != null) {
       await settingsHelper.update(settings);
-      print('imgf saved updated' + settings.toMap().toString());
     } else {
       await settingsHelper.insert(settings);
-      print('imgf saved inserted' + settings.toMap().toString());
     }
   }
 
-  logOutAction() {
+  void logOutAction() {
     final snackBar = SnackBar(
       content: const Text(
         'Log out successfully',
@@ -524,6 +560,8 @@ class SettingsPageState extends State<SettingsPage> {
       this.username = '';
       this.lastSyncDate = '';
       this.restoreDate = '';
+      this.restoreColor = darkMode ? Colors.white : Colors.black;
+      this.statusColor = darkMode ? Colors.white : Colors.black;
       settings.lastSyncDate = '';
       settings.userName = '';
       settings.restoreDate = '';
